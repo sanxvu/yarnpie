@@ -1,28 +1,28 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { getYarnStash } from '../../api';
+import { onYarnStashUpdate } from '../../api';
 
 export const YarnContext = createContext();
 
 export const YarnProvider = ({ children }) => {
     const [yarnStash, setYarnStash] = React.useState([])
-    const [loading, setLoading] = React.useState(false)
+    const [loading, setLoading] = useState(true);
     const [error, setError] = React.useState(null)
 
-    React.useEffect(() => {
-        async function fetchYarnData() {
-            setLoading(true)
-            try {
-                const data = await getYarnStash()
-                setYarnStash(data)
-            } catch (err) {
-                setError(err)
-            } finally {
-                setLoading(false)
+    useEffect(() => {
+        // Listen for real-time updates
+        const unsubscribe = onYarnStashUpdate(
+            (updatedStash) => {
+                setYarnStash(updatedStash);
+                setLoading(false);
+            },
+            (err) => {
+                setError(err.message);
+                setLoading(false);
             }
-        }
-
-        fetchYarnData()
-    }, [])
+        );
+        
+        return () => unsubscribe();
+    }, []);
 
     return (
         <YarnContext.Provider value={{ yarnStash, setYarnStash, loading, error }}>

@@ -88,3 +88,11 @@ main {
   justify-content: center;
   align-items: center;
 }
+
+.yarn-info>img {
+  height: 100px;
+}
+
+.yarn-detail>img {
+  height: 100px;
+}

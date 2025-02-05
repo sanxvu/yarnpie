@@ -1,6 +1,6 @@
 import React from "react"
-import { getProjects, getYarnStash } from "../../api"
 import { Link } from "react-router-dom"
+import { getProjects } from "../../api"
 
 export default function Projects() {
     const [projects, setProjects] = React.useState([])
@@ -24,15 +24,17 @@ export default function Projects() {
     }, [])
 
     const projectElements = projects.map(project => (
-        <div key={project.id} className="yarn-tile">
-            <Link
-                to={project.id}
-            >
+        <Link to={project.id} key={project.id}>
+            <div className="yarn-tile">
                 <div className="yarn-info">
-                    <h3>{project.name}</h3>
+                    <img src={project.image} />
+                    <h3>{project.name ? project.name : "Untitled Project"}</h3>
+                    <p>{project.status}</p>
                 </div>
-            </Link>
-        </div>
+            </div>
+        </Link>
+
+
     ))
 
     if (loading) {

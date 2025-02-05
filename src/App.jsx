@@ -4,6 +4,7 @@ import Home from "./pages/Home"
 import Login from "./pages/Login"
 import Projects from "./pages/projects/Projects"
 import AddProject from "./pages/projects/AddProject"
+import ProjectDetail from "./pages/projects/ProjectDetail"
 import Stash from "./pages/stash/Stash"
 import YarnDetail from "./pages/stash/YarnDetail"
 import AddYarn from "./pages/stash/AddYarn"
@@ -21,6 +22,7 @@ function App() {
             <Route path="login" element={<Login />} />
 
             <Route path="projects" element={<Projects />} />
+            <Route path="projects/:id" element={<ProjectDetail />} />
             <Route path="addProject" element={<AddProject />} />
             
             <Route path="stash" element={<Stash />} />

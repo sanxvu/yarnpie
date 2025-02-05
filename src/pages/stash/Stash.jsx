@@ -7,20 +7,15 @@ export default function Stash() {
     const { yarnStash, loading, error } = useContext(YarnContext)
 
     const yarnElements = yarnStash.map(yarn => (
-        <div key={yarn.id} className="yarn-tile">
-            <Link
-                to={yarn.id}
-            >
+        <Link to={yarn.id}>
+            <div key={yarn.id} className="yarn-tile">
                 <div className="yarn-info">
+                    <img src={yarn.image}></img>
                     <h3>{yarn.name}</h3>
-                    <p>Color: {yarn.color}</p>
-                    <p>Material: {yarn.material}</p>
-                    <p>Yarn Weight: {yarn.weight}</p>
-                    <p>Amount per skein: {yarn.amountPerSkein}<span>oz</span></p>
-                    <p>Skein amount: {yarn.skeinAmount}</p>
+                    <p>Available amount: {yarn.skeinAmount}<span> oz</span></p>
                 </div>
-            </Link>
-        </div>
+            </div>
+        </Link >
     ))
 
     if (loading) {

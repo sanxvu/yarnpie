@@ -1,21 +1,28 @@
-import React from "react"
-import { projectsCollection } from "../../api"
-import { addDoc } from "firebase/firestore/lite"
-import { useContext } from 'react';
-import { YarnContext } from '../stash/YarnContext';
+import { useContext, useState } from 'react';
+import { db, projectsCollection } from "../../api"
+import { doc, getDoc, updateDoc, addDoc, arrayUnion } from "firebase/firestore"
+import { YarnContext } from '../stash/YarnContext'
+import { useNavigate, Link, useLocation } from "react-router-dom"
+
 
 export default function AddProject() {
-    const [projectData, setProjectData] = React.useState(
+    const [projectData, setProjectData] = useState(
         {
-            name: ""
+            name: "",
+            status: "",
+            yarnUsed: "",
+            amountUsed: 0,
+            notes: ""
         }
     )
 
     const { yarnStash } = useContext(YarnContext)
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const yarnElements = yarnStash.map(yarn => (
-        <option value={yarn.name}>{yarn.name}</option>
-    ))
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [preview, setPreview] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     function handleChange(event) {
         const { name, value } = event.target
@@ -27,15 +34,72 @@ export default function AddProject() {
         })
     }
 
+    function handleFileChange(event) {
+        const file = event.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreview(URL.createObjectURL(file)); // Show preview before upload
+        }
+    }
+
     async function handleSubmit(event) {
         event.preventDefault() //prevent refresh and resetting inputs 
 
+        setLoading(true);
+
+        let imageUrl = "";
+
+        if (!projectData.yarnUsed) {
+            alert("Please select a yarn.")
+            return
+        }
+
+        if (selectedFile) {
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+            formData.append("upload_preset", import.meta.env.VITE_PRESET_NAME);
+            formData.append("cloud_name", import.meta.env.VITE_CLOUD_NAME);
+
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/image/upload`, {
+                    method: "POST",
+                    body: formData,
+                });
+                const data = await response.json();
+                imageUrl = data.secure_url; // Get uploaded image URL
+            } catch (error) {
+                console.error("Image upload error:", error);
+                setLoading(false);
+                return;
+            }
+        }
+
         const newProject = {
             ...projectData,
+            image: imageUrl,
             createdAt: Date.now(),
             updatedAt: Date.now()
         }
-        await addDoc(projectsCollection, newProject)
+
+        const projectRef = await addDoc(projectsCollection, newProject)
+        const projectId = projectRef.id
+
+        // Update yarn's usedInProjects and remainingAmount
+        const yarnRef = doc(db, "yarn", projectData.yarnUsed)
+        const yarnSnap = await getDoc(yarnRef)
+
+        if (yarnSnap.exists()) {
+            const yarnData = yarnSnap.data();
+            const totalAvailable = yarnData.skeinAmount * yarnData.amountPerSkein;
+            const newRemainingAmount = totalAvailable - projectData.amountUsed;
+
+            await updateDoc(yarnRef, {
+                remainingAmount: newRemainingAmount,
+                usedInProjects: arrayUnion(projectId)
+            });
+        }
+
+        navigate("/projects")
     }
 
     return (
@@ -98,6 +162,7 @@ export default function AddProject() {
             <br />
 
             <label htmlFor="favColor">Select yarn: </label>
+            <br />
             <select
                 id="yarnUsed"
                 value={projectData.yarnUsed}
@@ -105,8 +170,18 @@ export default function AddProject() {
                 name="yarnUsed"
             >
                 <option value="">-- Choose from stash--</option>
-                {yarnElements}
+                {yarnStash.map(yarn => (
+                    <option key={yarn.id} value={
+                        yarn.id
+                    }>{yarn.name}</option>
+                ))}
             </select>
+            <Link
+                to="../addYarn"
+                state={{ from: location.pathname }}
+            >
+                or add new yarn
+            </Link>
 
             <br />
             <br />
@@ -115,23 +190,33 @@ export default function AddProject() {
                 type="number"
                 placeholder="Amount used oz"
                 onChange={handleChange}
-                name="amountPerSkein"
-                value={projectData.amountPerSkein}
+                name="amountUsed"
+                value={projectData.amountUsed}
             />
 
             <br />
             <br />
 
             <textarea
-                value={projectData.notes}
                 placeholder="Notes"
                 onChange={handleChange}
                 name="notes"
+                value={projectData.notes}
             />
 
             <br />
+
+            {/* File Input */}
+            <input type="file" accept="image/*" onChange={handleFileChange} />
+
+            {/* Image Preview */}
+            {preview && <img src={preview} alt="Preview" style={{ width: "100px", marginTop: "10px" }} />}
+
             <br />
+            <br />
+
             <button>Submit</button>
+
         </form>
     )
 }

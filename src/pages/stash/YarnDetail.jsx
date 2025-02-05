@@ -1,6 +1,6 @@
 import React from "react"
 import { Link, useParams, useLocation } from "react-router-dom"
-import { getYarn } from "../../api"
+import { getYarn, deleteYarn } from "../../api"
 
 export default function YarnDetail() {
     const [yarn, setYarn] = React.useState(null)
@@ -24,6 +24,8 @@ export default function YarnDetail() {
         loadYarn()
     }, [id])
 
+    if (!yarn) return <p>Loading...</p>;
+
     if (loading) {
         return <h1>Loading...</h1>
     }
@@ -45,12 +47,33 @@ export default function YarnDetail() {
 
             {yarn && (
                 <div className="yarn-detail">
+                    <img src={yarn.image} />
                     <h3>{yarn.name}</h3>
                     <p>Color: {yarn.color}</p>
                     <p>Material: {yarn.material}</p>
                     <p>Yarn Weight: {yarn.weight}</p>
-                    <p>Amount per skein: {yarn.amountPerSkein}<span>oz</span></p>
-                    <p>Skein amount: {yarn.skeinAmount}</p>
+                    <p>Amount per skein: {yarn.amountPerSkein}<span> oz</span></p>
+                    <p>Skein Amount: {yarn.skeinAmount}<span> oz</span></p>
+                    <p>Used in projects:</p>
+                    <ul>
+                        {yarn.usedInProjects && yarn.usedInProjects.length > 0 ? (
+                            yarn.usedInProjects.map((projectId) => (
+                                <li key={projectId}>
+                                    <Link to={`/projects/${projectId}`}>{projectId}</Link>
+                                </li>
+                            ))
+                        ) : (
+                            <p>Not used in any projects</p>
+                        )}
+                    </ul>
+                    <p>Amount available: {yarn.remainingAmount}<span> oz</span></p>
+
+
+                    <Link to={`..${search}`} relative="path">
+                        <button onClick={() => deleteYarn(yarn.id, yarn.imagePublicId)}>
+                            Delete yarn
+                        </button>
+                    </Link>
                 </div>
             )}
         </div>
