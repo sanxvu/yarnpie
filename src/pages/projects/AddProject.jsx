@@ -57,11 +57,11 @@ export default function AddProject() {
         if (selectedFile) {
             const formData = new FormData();
             formData.append("file", selectedFile);
-            formData.append("upload_preset", import.meta.env.VITE_PRESET_NAME);
-            formData.append("cloud_name", import.meta.env.VITE_CLOUD_NAME);
+            formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_PRESET_NAME);
+            formData.append("cloud_name", import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
 
             try {
-                const response = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/image/upload`, {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`, {
                     method: "POST",
                     body: formData,
                 });
@@ -76,7 +76,7 @@ export default function AddProject() {
 
         const newProject = {
             ...projectData,
-            image: imageUrl,
+            image: imageUrl || "",
             createdAt: Date.now(),
             updatedAt: Date.now()
         }

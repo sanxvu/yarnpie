@@ -8,6 +8,9 @@ import {
     deleteDoc,
     onSnapshot,
 } from "firebase/firestore"
+import axios from "axios"
+
+const API_URL = "http://localhost:8080"; // Your backend URL
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -98,21 +101,31 @@ const cld = new Cloudinary({
     }
 });
 
-/* cloudinary.config({
-    cloud_name: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
-    api_key: import.meta.env.VITE_CLOUDINARY_API_KEY,
-    api_secret: import.meta.env.VITE_CLOUDINARY_API_SECRET,
-}) */
+//import dotenv from 'dotenv';
+//dotenv.config();
 
 // Delete a yarn
-export async function deleteYarn(yarnId, imagePublicId) {
-    /* cld.v2.uploader.destroy(imagePublicId, function (error, result) {
-        console.log(result, error)
-    })
-        .then(resp => console.log(resp))
-        .catch(_err => console.log("Something went wrong, please try again later."));
- */
-    const docRef = doc(db, "yarn", yarnId)
-    await deleteDoc(docRef)
+//export async function deleteYarn(yarnId, imagePublicId) {
+    //const cloudinary = require('cloudinary').v2
 
-}
+    // cloudinary.uploader
+    //     .destroy(imagePublicId)
+    //     .then(result => console.log(result))
+
+    //const docRef = doc(db, "yarn", yarnId)
+    //await deleteDoc(docRef)
+//}
+
+// Delete Yarn and Image (using Axios)
+export const deleteYarn = async (yarnId, imagePublicId) => {
+    try {
+        const response = await axios.delete(`http://localhost:8080/delete-yarn/${yarnId}`, {
+            data: { imagePublicId }, // Send the public ID of the image to delete
+        });
+        console.log("Yarn and image deleted:", response.data);
+        return response.data; // Return response to handle in UI (e.g., update yarn list)
+    } catch (error) {
+        console.error("Error deleting yarn and image:", error);
+        throw error;
+    }
+};

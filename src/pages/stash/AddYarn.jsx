@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from "react"
+import React from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { yarnCollection } from "../../api"
 import { addDoc } from "firebase/firestore"
-import UploadWidget from "../../components/UploadWidget"
+import { yarnCollection } from "../../api"
 
 export default function AddYarn() {
     const [yarnData, setYarnData] = React.useState(
@@ -20,32 +19,11 @@ export default function AddYarn() {
     )
     const navigate = useNavigate();
     const location = useLocation();
-    const returnPath = location.state?.from || "/stash"; 
+    const returnPath = location.state?.from || "/stash";
     const [loading, setLoading] = React.useState(false)
 
-    const cloudinaryRef = useRef()
-    const widgetRef = useRef()
     const [selectedFile, setSelectedFile] = React.useState(null)
-
-    useEffect(() => {
-        cloudinaryRef.current = window.cloudinary
-        widgetRef.current = cloudinaryRef.current.createUploadWidget({
-            cloudName: import.meta.env.VITE_CLOUD_NAME,
-            uploadPreset: import.meta.env.VITE_PRESET_NAME,
-            multiple: false
-        }, function (error, result) {
-            if (!error && result.event === "success") {
-                setSelectedFile(result.info.secure_url); // Store selected image URL in state
-                setYarnData(prevYarnData => {
-                    return {
-                        ...prevYarnData,
-                        image: result.info.secure_url,
-                        imagePublicId: result.info.public_id
-                    }
-                })
-            }
-        })
-    }, [])
+    const [preview, setPreview] = React.useState(null);
 
     function handleChange(event) {
         const { name, value } = event.target
@@ -57,16 +35,48 @@ export default function AddYarn() {
         })
     }
 
+    function handleFileChange(event) {
+        const file = event.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreview(URL.createObjectURL(file)); // Show preview before upload
+        }
+    }
+
     async function handleSubmit(event) {
         event.preventDefault() //prevent refresh and resetting inputs 
 
-        /* if (!selectedFile) {
-            alert("Please select an image before submitting.");
-            return;
+        setLoading(true);
+
+        let imageUrl = "";
+        let imagePublicId = "";
+
+        if (selectedFile) {
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+            formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_PRESET_NAME);
+            formData.append("cloud_name", import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: "POST",
+                    body: formData,
+                });
+                const data = await response.json();
+                imageUrl = data.secure_url; // Get image URL
+                imagePublicId = data.public_id; //Get public_id 
+                console.log(data)
+            } catch (error) {
+                console.error("Image upload error:", error);
+                setLoading(false);
+                return;
+            }
         }
- */
+
         const newYarn = {
             ...yarnData,
+            image: imageUrl || "",
+            imagePublicId: imagePublicId,
             createdAt: Date.now(),
             updatedAt: Date.now(),
             amountAvailable: yarnData.amountPerSkein * yarnData.skeinAmount
@@ -130,8 +140,12 @@ export default function AddYarn() {
                     value={yarnData.skeinAmount}
                 />
 
-                <button type="button" onClick={() => widgetRef.current.open()}>Select Image</button>
-                {selectedFile && <img src={selectedFile} alt="Selected Yarn" style={{ width: "100px", marginTop: "10px" }} />}
+
+                {/* File Input */}
+                <input type="file" accept="image/*" onChange={handleFileChange} />
+
+                {/* Image Preview */}
+                {preview && <img src={preview} alt="Preview" style={{ width: "100px", marginTop: "10px" }} />}
 
                 <br />
                 <br />
