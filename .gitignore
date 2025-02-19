@@ -23,4 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 .env
-backend/firebase-admin.json
+backend/yarnies-firebase-adminsdk-fbsvc-697b7a316a.json
