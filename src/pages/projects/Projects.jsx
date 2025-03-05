@@ -6,6 +6,7 @@ export default function Projects() {
     const [projects, setProjects] = React.useState([])
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(null)
+    const [sortOption, setSortOption] = React.useState("lastUpdated");
 
     React.useEffect(() => {
         async function loadProjects() {
@@ -23,7 +24,20 @@ export default function Projects() {
         loadProjects()
     }, [])
 
-    const projectElements = projects.map(project => (
+    const sortedProjects = [...projects].sort((a, b) => {
+        switch (sortOption) {
+            case "name":
+                return a.name.localeCompare(b.name)
+            case "lastUpdated":
+                return b.updatedAt - a.updatedAt
+            case "startDate":
+                return b.createdAt - a.createdAt
+            default:
+                return 0
+        }
+    })
+
+    const projectElements = sortedProjects.map(project => (
         <Link to={project.id} key={project.id}>
             <div className="yarn-tile">
                 <div className="yarn-info">
@@ -33,8 +47,6 @@ export default function Projects() {
                 </div>
             </div>
         </Link>
-
-
     ))
 
     if (loading) {
@@ -50,7 +62,24 @@ export default function Projects() {
             <h1>Projects</h1>
             <p>{projectElements.length} projects total</p>
 
-            <Link to="../addProject">Add project</Link>
+            <Link to="../addProject">
+                <button>
+                    Add project
+                </button>
+            </Link>
+            
+            <br /> <br />
+
+            Sort by:
+            <select
+                className="projects-filter"
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+            >
+                <option value="name">Name</option>
+                <option value="lastUpdated">Last Updated</option>
+                <option value="startDate">Start Date</option>
+            </select>
 
             <div className="stash-list">
                 {projectElements}

@@ -9,8 +9,13 @@ import {
     onSnapshot,
 } from "firebase/firestore"
 import axios from "axios"
-
-const API_URL = "http://localhost:8080"; // Your backend URL
+import { Cloudinary } from "@cloudinary/url-gen";
+const cld = new Cloudinary({
+    cloud: {
+        cloudName: import.meta.env.VITE_CLOUD_NAME
+    }
+});
+const API_URL = "http://localhost:8080"; // Backend URL
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -94,38 +99,16 @@ export function onYarnStashUpdate(callback) {
     });
 }
 
-import { Cloudinary } from "@cloudinary/url-gen";
-const cld = new Cloudinary({
-    cloud: {
-        cloudName: import.meta.env.VITE_CLOUD_NAME
-    }
-});
-
-//import dotenv from 'dotenv';
-//dotenv.config();
-
-// Delete a yarn
-//export async function deleteYarn(yarnId, imagePublicId) {
-    //const cloudinary = require('cloudinary').v2
-
-    // cloudinary.uploader
-    //     .destroy(imagePublicId)
-    //     .then(result => console.log(result))
-
-    //const docRef = doc(db, "yarn", yarnId)
-    //await deleteDoc(docRef)
-//}
-
-// Delete Yarn and Image (using Axios)
-export const deleteYarn = async (yarnId, imagePublicId) => {
+// Delete Yarn or Project and Image if included
+export const deleteItem = async (itemType, itemId, imagePublicId) => {
     try {
-        const response = await axios.delete(`http://localhost:8080/delete-yarn/${yarnId}`, {
-            data: { imagePublicId }, // Send the public ID of the image to delete
+        const response = await axios.delete(`http://localhost:8080/delete-${itemType}/${itemId}`, {
+            data: { imagePublicId: imagePublicId || null },
         });
-        console.log("Yarn and image deleted:", response.data);
-        return response.data; // Return response to handle in UI (e.g., update yarn list)
+        console.log("Yarn/project and image deleted:", response.data);
+        return response.data;
     } catch (error) {
-        console.error("Error deleting yarn and image:", error);
+        console.error("Error deleting yarn/project and image:", error);
         throw error;
     }
 };

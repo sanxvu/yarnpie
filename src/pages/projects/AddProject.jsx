@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { db, projectsCollection } from "../../api"
 import { doc, getDoc, updateDoc, addDoc, arrayUnion } from "firebase/firestore"
 import { YarnContext } from '../stash/YarnContext'
@@ -6,23 +6,34 @@ import { useNavigate, Link, useLocation } from "react-router-dom"
 
 
 export default function AddProject() {
-    const [projectData, setProjectData] = useState(
-        {
-            name: "",
-            status: "",
-            yarnUsed: "",
-            amountUsed: 0,
-            notes: ""
-        }
-    )
-
     const { yarnStash } = useContext(YarnContext)
-    const navigate = useNavigate();
-    const location = useLocation();
+    const navigate = useNavigate()
+    const location = useLocation()
+
+    const [projectData, setProjectData] = useState({
+        name: "",
+        status: "",
+        yarnUsed: "",
+        amountUsed: 0,
+        notes: ""
+    })
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    // Update projectData if location.state has formData
+    useEffect(() => {
+        if (location.state?.formData) {
+            setProjectData(location.state.formData);
+        }
+        if (location.state?.newYarn) {
+            setProjectData(prevProjectData => ({
+                ...prevProjectData,
+                yarnUsed: location.state.newYarn.id
+            }));
+        }
+    }, [location.state]);
 
     function handleChange(event) {
         const { name, value } = event.target
@@ -38,16 +49,17 @@ export default function AddProject() {
         const file = event.target.files[0];
         if (file) {
             setSelectedFile(file);
-            setPreview(URL.createObjectURL(file)); // Show preview before upload
+            setPreview(URL.createObjectURL(file));
         }
     }
 
     async function handleSubmit(event) {
-        event.preventDefault() //prevent refresh and resetting inputs 
+        event.preventDefault() // Prevent refresh and resetting inputs 
 
         setLoading(true);
 
         let imageUrl = "";
+        let imagePublicId = "";
 
         if (!projectData.yarnUsed) {
             alert("Please select a yarn.")
@@ -66,7 +78,9 @@ export default function AddProject() {
                     body: formData,
                 });
                 const data = await response.json();
-                imageUrl = data.secure_url; // Get uploaded image URL
+                imageUrl = data.secure_url; // Get image URL
+                imagePublicId = data.public_id; //Get public_id 
+                console.log(data)
             } catch (error) {
                 console.error("Image upload error:", error);
                 setLoading(false);
@@ -77,6 +91,7 @@ export default function AddProject() {
         const newProject = {
             ...projectData,
             image: imageUrl || "",
+            imagePublicId: imagePublicId,
             createdAt: Date.now(),
             updatedAt: Date.now()
         }
@@ -103,120 +118,128 @@ export default function AddProject() {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                placeholder="Name"
-                onChange={handleChange}
-                name="name"
-                value={projectData.name}
-            />
+        <div>
 
-            <fieldset>
-                <legend>Status</legend>
-
-                <input
-                    type="radio"
-                    id="workInProgress"
-                    name="status"
-                    value="workInProgress"
-                    checked={projectData.status === "workInProgress"}
-                    onChange={handleChange}
-                />
-                <label htmlFor="unemployed">Work in Progress</label>
-                <br />
-
-                <input
-                    type="radio"
-                    id="completed"
-                    name="status"
-                    value="completed"
-                    checked={projectData.status === "completed"}
-                    onChange={handleChange}
-                />
-                <label htmlFor="part-time">Completed</label>
-                <br />
-
-                <input
-                    type="radio"
-                    id="abandoned"
-                    name="status"
-                    value="abandoned"
-                    checked={projectData.status === "abandoned"}
-                    onChange={handleChange}
-                />
-                <label htmlFor="full-time">Abandoned</label>
-                <br />
-
-                <input
-                    type="radio"
-                    id="frogged"
-                    name="status"
-                    value="frogged"
-                    checked={projectData.status === "frogged"}
-                    onChange={handleChange}
-                />
-                <label htmlFor="full-time">Frogged</label>
-                <br />
-            </fieldset>
-            <br />
-
-            <label htmlFor="favColor">Select yarn: </label>
-            <br />
-            <select
-                id="yarnUsed"
-                value={projectData.yarnUsed}
-                onChange={handleChange}
-                name="yarnUsed"
-            >
-                <option value="">-- Choose from stash--</option>
-                {yarnStash.map(yarn => (
-                    <option key={yarn.id} value={
-                        yarn.id
-                    }>{yarn.name}</option>
-                ))}
-            </select>
             <Link
-                to="../addYarn"
-                state={{ from: location.pathname }}
-            >
-                or add new yarn
-            </Link>
+                to={"/stash"}
+                className="back-button"
+            >&larr; <span>Back to Projects</span></Link>
 
-            <br />
-            <br />
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    placeholder="Name"
+                    onChange={handleChange}
+                    name="name"
+                    value={projectData.name}
+                />
 
-            <input
-                type="number"
-                placeholder="Amount used oz"
-                onChange={handleChange}
-                name="amountUsed"
-                value={projectData.amountUsed}
-            />
+                <fieldset>
+                    <legend>Status</legend>
 
-            <br />
-            <br />
+                    <input
+                        type="radio"
+                        id="workInProgress"
+                        name="status"
+                        value="workInProgress"
+                        checked={projectData.status === "workInProgress"}
+                        onChange={handleChange}
+                    />
+                    <label htmlFor="unemployed">Work in Progress</label>
+                    <br />
 
-            <textarea
-                placeholder="Notes"
-                onChange={handleChange}
-                name="notes"
-                value={projectData.notes}
-            />
+                    <input
+                        type="radio"
+                        id="completed"
+                        name="status"
+                        value="completed"
+                        checked={projectData.status === "completed"}
+                        onChange={handleChange}
+                    />
+                    <label htmlFor="part-time">Completed</label>
+                    <br />
 
-            <br />
+                    <input
+                        type="radio"
+                        id="abandoned"
+                        name="status"
+                        value="abandoned"
+                        checked={projectData.status === "abandoned"}
+                        onChange={handleChange}
+                    />
+                    <label htmlFor="full-time">Abandoned</label>
+                    <br />
 
-            {/* File Input */}
-            <input type="file" accept="image/*" onChange={handleFileChange} />
+                    <input
+                        type="radio"
+                        id="frogged"
+                        name="status"
+                        value="frogged"
+                        checked={projectData.status === "frogged"}
+                        onChange={handleChange}
+                    />
+                    <label htmlFor="full-time">Frogged</label>
+                    <br />
+                </fieldset>
+                <br />
 
-            {/* Image Preview */}
-            {preview && <img src={preview} alt="Preview" style={{ width: "100px", marginTop: "10px" }} />}
+                <label htmlFor="favColor">Select yarn: </label>
+                <br />
+                <select
+                    id="yarnUsed"
+                    value={projectData.yarnUsed}
+                    onChange={handleChange}
+                    name="yarnUsed"
+                >
+                    <option value="">-- Choose from stash--</option>
+                    {yarnStash.map(yarn => (
+                        <option key={yarn.id} value={
+                            yarn.id
+                        }>{yarn.name}</option>
+                    ))}
+                </select>
+                <Link
+                    to="../addYarn"
+                    state={{ from: location.pathname, formData: projectData }}
+                >
+                    or add new yarn
+                </Link>
 
-            <br />
-            <br />
+                <br />
+                <br />
 
-            <button>Submit</button>
+                <input
+                    type="number"
+                    placeholder="Amount used oz"
+                    onChange={handleChange}
+                    name="amountUsed"
+                    value={projectData.amountUsed}
+                />
 
-        </form>
+                <br />
+                <br />
+
+                <textarea
+                    placeholder="Notes"
+                    onChange={handleChange}
+                    name="notes"
+                    value={projectData.notes}
+                />
+
+                <br />
+
+                {/* File Input */}
+                <input type="file" accept="image/*" onChange={handleFileChange} />
+
+                {/* Image Preview */}
+                {preview && <img src={preview} alt="Preview" style={{ width: "100px", marginTop: "10px" }} />}
+
+                <br />
+                <br />
+
+                <button>Submit</button>
+
+            </form>
+        </div>
     )
 }

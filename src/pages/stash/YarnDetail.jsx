@@ -1,16 +1,17 @@
 import React from "react"
-import { Link, useParams, useLocation } from "react-router-dom"
-import { getYarn, deleteYarn } from "../../api"
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom"
+import { getYarn, deleteItem } from "../../api"
 
 export default function YarnDetail() {
     const [yarn, setYarn] = React.useState(null)
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(null)
     const { id } = useParams()
+    const navigate = useNavigate()
     const location = useLocation()
-
+    
     React.useEffect(() => {
-        async function loadYarn() {
+        async function fetchYarn() {
             setLoading(true)
             try {
                 const data = await getYarn(id)
@@ -21,10 +22,21 @@ export default function YarnDetail() {
                 setLoading(false)
             }
         }
-        loadYarn()
+        fetchYarn()
     }, [id])
 
-    if (!yarn) return <p>Loading...</p>;
+    const handleDeleteYarn = async () => {
+        setLoading(true)
+        try {
+            await deleteItem("yarn", yarn.id, yarn.imagePublicId)
+            navigate("/stash", { replace: true });
+        }
+        catch (err) {
+            setError(err)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     if (loading) {
         return <h1>Loading...</h1>
@@ -68,12 +80,19 @@ export default function YarnDetail() {
                     </ul>
                     <p>Amount available: {yarn.remainingAmount}<span> oz</span></p>
 
-
-                    <Link to={`..${search}`} relative="path">
-                        <button onClick={() => deleteYarn(yarn.id, yarn.imagePublicId)}>
-                            Delete yarn
+                    <Link
+                        to="../editYarn"
+                        state={{ from: location.pathname, yarnId: yarn.id, formData: yarn }}
+                    >
+                        <button>
+                            Edit yarn
                         </button>
                     </Link>
+
+                    <button onClick={() => handleDeleteYarn()}>
+                        Delete yarn
+                    </button>
+
                 </div>
             )}
         </div>

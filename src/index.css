@@ -12,12 +12,23 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@font-face {
+  font-family: 'Aztech Forest';
+  src: url('/fonts/AztechForest-9YJa0.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
 }
 
+h1 {
+  font-family: "Aztech Forest";
+  font-size: 40px;
+}
 
 a {
   text-decoration: unset;
@@ -38,11 +49,10 @@ header {
 }
 
 header .site-logo {
-  color: black;
   margin-right: auto;
-  text-transform: uppercase;
-  font-weight: 900;
-  font-size: 25px;
+  color: black;
+  font-family: "Aztech Forest";
+  font-size: 30px;
 }
 
 header a {
@@ -65,7 +75,18 @@ main {
   margin-bottom: 84px;
 }
 
+/*** HOME PAGE ***/
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /*** STASH PAGE ***/
+.stash-container {
+  padding: 20px;
+}
+
 .stash-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, 300px);

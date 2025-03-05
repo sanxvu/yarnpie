@@ -1,6 +1,6 @@
 import React from "react"
-import { Link, useParams, useLocation } from "react-router-dom"
-import { getProject, deleteProject } from "../../api"
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom"
+import { getProject, deleteItem } from "../../api"
 
 export default function ProjectDetail() {
     const [project, setProject] = React.useState(null)
@@ -8,6 +8,7 @@ export default function ProjectDetail() {
     const [error, setError] = React.useState(null)
     const { id } = useParams()
     const location = useLocation()
+    const navigate = useNavigate()
 
     React.useEffect(() => {
         async function fetchProject() {
@@ -23,6 +24,20 @@ export default function ProjectDetail() {
         }
         fetchProject()
     }, [id])
+
+
+    const handleDeleteProject = async () => {
+        setLoading(true)
+        try {
+            await deleteItem("project", project.id, project.imagePublicId)
+            navigate("/projects", { replace: true });
+        }
+        catch (err) {
+            setError(err)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     if (loading) {
         return <h1>Loading...</h1>
@@ -51,11 +66,18 @@ export default function ProjectDetail() {
                     <p>Amount Used: {project.amountUsed}<span> oz</span></p>
                     <p>Notes: {project.notes}</p>
 
-                    <Link to={`..${search}`} relative="path">
-                        <button onClick={() => deleteProject(project.id)}>
-                            Delete project
+                    <Link
+                        to="../editProject"
+                        state={{ from: location.pathname, projectId: project.id, formData: project }}
+                    >
+                        <button>
+                            Edit project
                         </button>
                     </Link>
+
+                    <button onClick={() => handleDeleteProject()}>
+                        Delete project
+                    </button>
 
                 </div>
             )}

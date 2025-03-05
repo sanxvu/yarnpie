@@ -24,21 +24,16 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Delete yarn, and image if included
 app.delete("/delete-yarn/:id", async (req, res) => {
-    console.log("Received DELETE request for yarn ID:", req.params.id);
-    console.log("Request body:", req.body);
-
     const yarnId = req.params.id;
-    const { imagePublicId } = req.body; // Public ID of the image in Cloudinary
-
-    if (!imagePublicId) {
-        return res.status(400).json({ error: "Image public ID is required" });
-    }
+    const { imagePublicId } = req.body; 
 
     try {
         // Step 1: Delete the image from Cloudinary
-        await cloudinary.uploader.destroy(imagePublicId);
-
+        if (imagePublicId) {
+            await cloudinary.uploader.destroy(imagePublicId);
+        }
         // Step 2: Delete the yarn from Firestore
         const yarnRef = db.collection("yarn").doc(yarnId);
         await yarnRef.delete();
@@ -47,6 +42,27 @@ app.delete("/delete-yarn/:id", async (req, res) => {
     } catch (error) {
         console.error("Error deleting yarn or image:", error);
         res.status(500).json({ error: "Failed to delete yarn and image" });
+    }
+});
+
+// Delete project, and iamge if included
+app.delete("/delete-project/:id", async (req, res) => {
+    const projectId = req.params.id;
+    const { imagePublicId } = req.body; 
+
+    try {
+        // Step 1: Delete the image from Cloudinary
+        if (imagePublicId) {
+            await cloudinary.uploader.destroy(imagePublicId);
+        }
+        // Step 2: Delete the yarn from Firestore
+        const projectRef = db.collection("projects").doc(projectId);
+        await projectRef.delete();
+
+        res.status(200).json({ message: "Project and image deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting project or image:", error);
+        res.status(500).json({ error: "Failed to delete project and image" });
     }
 });
 

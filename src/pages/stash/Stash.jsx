@@ -5,10 +5,22 @@ import { YarnContext } from './YarnContext';
 
 export default function Stash() {
     const { yarnStash, loading, error } = useContext(YarnContext)
+    const [sortOption, setSortOption] = React.useState("lastUpdated");
 
-    const yarnElements = yarnStash.map(yarn => (
-        <Link to={yarn.id}>
-            <div key={yarn.id} className="yarn-tile">
+    const sortedYarn = [...yarnStash].sort((a, b) => {
+        switch (sortOption) {
+            case "name":
+                return a.name.localeCompare(b.name)
+            case "lastUpdated":
+                return b.updatedAt - a.updatedAt
+            default:
+                return 0
+        }
+    })
+
+    const yarnElements = sortedYarn.map(yarn => (
+        <Link to={yarn.id} key={yarn.id}>
+            <div className="yarn-tile">
                 <div className="yarn-info">
                     <img src={yarn.image}></img>
                     <h3>{yarn.name}</h3>
@@ -31,8 +43,22 @@ export default function Stash() {
             <h1>Stash</h1>
             <p>{yarnElements.length} yarn total</p>
 
-            <Link to="../addYarn">Add yarn</Link>
+            <Link to="../addYarn">
+                <button>
+                    Add yarn
+                </button>
+            </Link>
+            <br /> <br />
 
+            Sort by:
+            <select
+                className="projects-filter"
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+            >
+                <option value="name">Name</option>
+                <option value="lastUpdated">Last Updated</option>
+            </select>
             <div className="stash-list">
                 {yarnElements}
             </div>

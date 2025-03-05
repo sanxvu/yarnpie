@@ -5,10 +5,12 @@ import Home from "./pages/Home"
 import Login from "./pages/Login"
 import Projects from "./pages/projects/Projects"
 import AddProject from "./pages/projects/AddProject"
+import EditProject from "./pages/projects/EditProject"
 import ProjectDetail from "./pages/projects/ProjectDetail"
 import Stash from "./pages/stash/Stash"
 import YarnDetail from "./pages/stash/YarnDetail"
 import AddYarn from "./pages/stash/AddYarn"
+import EditYarn from "./pages/stash/EditYarn"
 import { YarnProvider } from './pages/stash/YarnContext';
 import NotFound from "./pages/NotFound"
 import axios from "axios"
@@ -34,10 +36,12 @@ function App() {
             <Route path="projects" element={<Projects />} />
             <Route path="projects/:id" element={<ProjectDetail />} />
             <Route path="addProject" element={<AddProject />} />
+            <Route path="editProject" element={<EditProject />} />
 
             <Route path="stash" element={<Stash />} />
             <Route path="stash/:id" element={<YarnDetail />} />
             <Route path="addYarn" element={<AddYarn />} />
+            <Route path="editYarn" element={<EditYarn />} />
 
             <Route path="*" element={<NotFound />} />
           </Route>

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
-import { useLocation, useNavigate, Link } from "react-router-dom"
-import { addDoc } from "firebase/firestore"
-import { yarnCollection } from "../../api"
+import { useLocation, useNavigate } from "react-router-dom"
+import { doc, setDoc } from "firebase/firestore"
+import { db } from "../../api"
 
-export default function AddYarn() {
+export default function EditYarn() {
     const [yarnData, setYarnData] = useState(
         {
             name: "",
@@ -56,8 +56,8 @@ export default function AddYarn() {
 
         setLoading(true);
 
-        let imageUrl = "";
-        let imagePublicId = "";
+        let imageUrl = yarnData.imageUrl || "";
+        let imagePublicId = yarnData.imagePublicId || "";
 
         if (selectedFile) {
             const formData = new FormData();
@@ -81,27 +81,19 @@ export default function AddYarn() {
             }
         }
 
-        const newYarn = {
-            ...yarnData,
-            image: imageUrl || "",
-            imagePublicId: imagePublicId,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            amountAvailable: yarnData.amountPerSkein * yarnData.skeinAmount
-        }
-
-        const yarnRef = await addDoc(yarnCollection, newYarn)
-
-        // Return back to Stash or Add Project page
-        navigate(returnPath, {
-            state: {
-                newYarn: {
-                    id: yarnRef.id,
-                    name: yarnData.name
-                },
-                formData: location.state?.formData
+        // Update yarn 
+        const docRef = doc(db, "yarn", location.state.yarnId)
+        await setDoc(
+            docRef,
+            {
+                ...yarnData,
+                image: imageUrl,
+                imagePublicId: imagePublicId,
             }
-        })
+        )
+
+        // Return back to Stash page
+        navigate(returnPath)
     }
 
     if (loading) {
@@ -110,11 +102,6 @@ export default function AddYarn() {
 
     return (
         <div>
-            <Link
-                to={"/stash"}
-                className="back-button"
-            >&larr; <span>Back to Stash</span></Link>
-
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
@@ -159,18 +146,14 @@ export default function AddYarn() {
                     value={yarnData.skeinAmount}
                 />
 
-
-                {/* File Input */}
                 <input type="file" accept="image/*" onChange={handleFileChange} />
-
-                {/* Image Preview */}
                 {preview && <img src={preview} alt="Preview" style={{ width: "100px", marginTop: "10px" }} />}
 
                 <br />
                 <br />
 
                 <button type="submit">
-                    Submit
+                    Submit edits
                 </button>
             </form>
         </div>
