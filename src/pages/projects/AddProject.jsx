@@ -121,7 +121,7 @@ export default function AddProject() {
         <div>
 
             <Link
-                to={"/stash"}
+                to={"/projects"}
                 className="back-button"
             >&larr; <span>Back to Projects</span></Link>
 

@@ -22,5 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
 .env
-backend/yarnies-firebase-adminsdk-fbsvc-697b7a316a.json
+/backend/firebase-admin-sdk-key.json

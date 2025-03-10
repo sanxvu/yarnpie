@@ -3,8 +3,7 @@ const cors = require("cors")
 const admin = require("firebase-admin")
 const path = require('path')
 
-// Path to your service account file
-const serviceAccount = require("./yarnies-firebase-adminsdk-fbsvc-697b7a316a.json")
+const serviceAccount = require(process.env.FIREBASE_SERVICE_ACCOUNT_PATH)
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
