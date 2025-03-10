@@ -1,19 +1,20 @@
-import { useEffect } from "react"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Layout from "./components/Layout"
-import Home from "./pages/Home"
-import Login from "./pages/Login"
-import Projects from "./pages/projects/Projects"
-import AddProject from "./pages/projects/AddProject"
-import EditProject from "./pages/projects/EditProject"
-import ProjectDetail from "./pages/projects/ProjectDetail"
-import Stash from "./pages/stash/Stash"
-import YarnDetail from "./pages/stash/YarnDetail"
-import AddYarn from "./pages/stash/AddYarn"
-import EditYarn from "./pages/stash/EditYarn"
-import { YarnProvider } from './pages/stash/YarnContext';
-import NotFound from "./pages/NotFound"
-import axios from "axios"
+import { useEffect, lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+import { YarnProvider } from "./pages/stash/YarnContext";
+import axios from "axios";
+
+const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/Login"));
+const Projects = lazy(() => import("./pages/projects/Projects"));
+const AddProject = lazy(() => import("./pages/projects/AddProject"));
+const EditProject = lazy(() => import("./pages/projects/EditProject"));
+const ProjectDetail = lazy(() => import("./pages/projects/ProjectDetail"));
+const Stash = lazy(() => import("./pages/stash/Stash"));
+const YarnDetail = lazy(() => import("./pages/stash/YarnDetail"));
+const AddYarn = lazy(() => import("./pages/stash/AddYarn"));
+const EditYarn = lazy(() => import("./pages/stash/EditYarn"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 function App() {
   const fetchAPI = async () => {
@@ -24,32 +25,32 @@ function App() {
   useEffect(() => {
     fetchAPI()
   }, [])
-
   return (
     <YarnProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="login" element={<Login />} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="login" element={<Login />} />
 
-            <Route path="projects" element={<Projects />} />
-            <Route path="projects/:id" element={<ProjectDetail />} />
-            <Route path="addProject" element={<AddProject />} />
-            <Route path="editProject" element={<EditProject />} />
+              <Route path="projects" element={<Projects />} />
+              <Route path="projects/:id" element={<ProjectDetail />} />
+              <Route path="addProject" element={<AddProject />} />
+              <Route path="editProject" element={<EditProject />} />
 
-            <Route path="stash" element={<Stash />} />
-            <Route path="stash/:id" element={<YarnDetail />} />
-            <Route path="addYarn" element={<AddYarn />} />
-            <Route path="editYarn" element={<EditYarn />} />
+              <Route path="stash" element={<Stash />} />
+              <Route path="stash/:id" element={<YarnDetail />} />
+              <Route path="addYarn" element={<AddYarn />} />
+              <Route path="editYarn" element={<EditYarn />} />
 
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter >
-    </YarnProvider >
-
-  )
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </YarnProvider>
+  );
 }
 
 export default App

@@ -1,21 +1,17 @@
-import { initializeApp } from "firebase/app"
-import {
-    getFirestore,
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    deleteDoc,
-    onSnapshot,
-} from "firebase/firestore"
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, doc, getDoc, getDocs, deleteDoc, onSnapshot } from "firebase/firestore"
 import axios from "axios"
+
+/* 
 import { Cloudinary } from "@cloudinary/url-gen";
+
 const cld = new Cloudinary({
     cloud: {
         cloudName: import.meta.env.VITE_CLOUD_NAME
     }
-});
-const API_URL = "http://localhost:8080"; // Backend URL
+}); */
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
