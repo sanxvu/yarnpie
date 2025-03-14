@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { onYarnStashUpdate } from '../../api';
+import { onYarnStashUpdate } from '../api';
 
 export const YarnContext = createContext();
 

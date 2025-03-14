@@ -1,29 +1,7 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, getDoc, getDocs, deleteDoc, onSnapshot } from "firebase/firestore"
+import { db } from "./firebase/firebase"
+import { collection, doc, getDoc, getDocs, deleteDoc, onSnapshot } from "firebase/firestore"
 import axios from "axios"
 
-/* 
-import { Cloudinary } from "@cloudinary/url-gen";
-
-const cld = new Cloudinary({
-    cloud: {
-        cloudName: import.meta.env.VITE_CLOUD_NAME
-    }
-}); */
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID
-};
-
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app)
 export const yarnCollection = collection(db, "yarn")
 export const projectsCollection = collection(db, "projects")
 

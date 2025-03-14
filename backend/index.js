@@ -1,17 +1,16 @@
+require("dotenv").config(); 
 const express = require("express")
 const cors = require("cors")
 const admin = require("firebase-admin")
 const path = require('path')
 
 const serviceAccount = require(process.env.FIREBASE_SERVICE_ACCOUNT_PATH)
-
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 const db = admin.firestore();
 
 const cloudinary = require("cloudinary").v2;
-require("dotenv").config(); // Load environment variables
 
 const app = express()
 app.use(express.json());
@@ -26,7 +25,7 @@ cloudinary.config({
 // Delete yarn, and image if included
 app.delete("/delete-yarn/:id", async (req, res) => {
     const yarnId = req.params.id;
-    const { imagePublicId } = req.body; 
+    const { imagePublicId } = req.body;
 
     try {
         // Step 1: Delete the image from Cloudinary
@@ -47,7 +46,7 @@ app.delete("/delete-yarn/:id", async (req, res) => {
 // Delete project, and iamge if included
 app.delete("/delete-project/:id", async (req, res) => {
     const projectId = req.params.id;
-    const { imagePublicId } = req.body; 
+    const { imagePublicId } = req.body;
 
     try {
         // Step 1: Delete the image from Cloudinary

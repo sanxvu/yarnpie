@@ -1,40 +1,65 @@
-import React from "react"
-import { Link, NavLink } from "react-router-dom"
+import React from "react";
+import { Link, NavLink } from "react-router-dom";
+import { useAuth } from '../contexts/AuthContext';
+import { doSignOut } from '../firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 export default function Header() {
+    const { userLoggedIn } = useAuth();
+    const navigate = useNavigate();
+
     const activeStyles = {
         fontWeight: "bold",
         textDecoration: "underline",
         color: "#161616"
-    }
+    };
 
     return (
         <header>
             <Link className="site-logo" to="/">
                 yarnies
             </Link>
+
             <nav>
-                <NavLink
-                    to="/projects"
-                    style={({ isActive }) => isActive ? activeStyles : null}
-                >
-                    Projects
-                </NavLink>
+                {userLoggedIn && (
+                    <>
+                        <NavLink
+                            to="/projects"
+                            style={({ isActive }) => (isActive ? activeStyles : null)}
+                        >
+                            Projects
+                        </NavLink>
+
+                        <NavLink
+                            to="/stash"
+                            style={({ isActive }) => (isActive ? activeStyles : null)}
+                        >
+                            Stash
+                        </NavLink>
+                    </>
+                )}
 
                 <NavLink
-                    to="/stash"
-                    style={({ isActive }) => isActive ? activeStyles : null}
+                    to="/login"
+                    style={({ isActive }) => (isActive ? activeStyles : null)}
                 >
-                    Stash
+                    {userLoggedIn ? (
+                        <button
+                            onClick={() => {
+                                doSignOut().then(() => {
+                                    navigate('/login');
+                                });
+                            }}
+                        >
+                            Logout
+                        </button>
+                    ) : (
+                        <Link to="/login">
+                            Log in / Sign up
+                        </Link>
+                    )}
                 </NavLink>
-
-                <Link to="login" className="login-link">
-                    <img
-                        className="login-icon"
-                    />
-                    Login
-                </Link>
             </nav>
         </header>
-    )
+    );
 }

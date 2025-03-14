@@ -1,11 +1,12 @@
+import axios from "axios";
 import { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { YarnProvider } from "./contexts/YarnContext";
 import Layout from "./components/Layout";
-import { YarnProvider } from "./pages/stash/YarnContext";
-import axios from "axios";
 
 const Home = lazy(() => import("./pages/Home"));
-const Login = lazy(() => import("./pages/Login"));
+const Login = lazy(() => import("./pages/auth/Login"));
+const Register = lazy(() => import("./pages/auth/Register"));
 const Projects = lazy(() => import("./pages/projects/Projects"));
 const AddProject = lazy(() => import("./pages/projects/AddProject"));
 const EditProject = lazy(() => import("./pages/projects/EditProject"));
@@ -33,6 +34,7 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
 
               <Route path="projects" element={<Projects />} />
               <Route path="projects/:id" element={<ProjectDetail />} />
