@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
-import { db } from "../../api"
+import { db } from "../../firebase/firebase"
 import { doc, getDoc, updateDoc, setDoc, arrayUnion } from "firebase/firestore"
-import { YarnContext } from '../stash/YarnContext'
+import { YarnContext } from '../../contexts/YarnContext';
 import { useNavigate, Link, useLocation } from "react-router-dom"
 
 export default function AddProject() {
