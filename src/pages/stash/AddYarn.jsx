@@ -2,8 +2,10 @@ import { useState, useEffect } from "react"
 import { useLocation, useNavigate, Link } from "react-router-dom"
 import { addDoc } from "firebase/firestore"
 import { yarnCollection } from "../../api"
+import { useAuth } from "../../contexts/AuthContext"
 
 export default function AddYarn() {
+    const { currentUser } = useAuth()
     const [yarnData, setYarnData] = useState(
         {
             name: "",
@@ -14,7 +16,8 @@ export default function AddYarn() {
             skeinAmount: 0,
             image: "",
             usedInProjects: null,
-            amountAvailable: 0
+            amountAvailable: 0,
+            userId: currentUser.uid
         }
     )
     const navigate = useNavigate();

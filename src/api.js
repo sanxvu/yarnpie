@@ -1,18 +1,28 @@
 import { db } from "./firebase/firebase"
-import { collection, doc, getDoc, getDocs, deleteDoc, onSnapshot } from "firebase/firestore"
+import { collection, doc, getDoc, getDocs, deleteDoc, onSnapshot, query, where } from "firebase/firestore"
 import axios from "axios"
 
 export const yarnCollection = collection(db, "yarn")
 export const projectsCollection = collection(db, "projects")
 
 // Get all projects (fetches once, no real-time updates)
-export async function getProjects() {
-    const snapshot = await getDocs(projectsCollection)
-    const projects = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-    }))
-    return projects
+export async function getProjects(user) {
+    if (!user) {
+        console.log("No user signed in");
+        return;
+    }
+
+    const projectsRef = collection(db, "projects");
+    const q = query(projectsRef, where("userId", "==", user.uid));
+
+    const querySnapshot = await getDocs(q);
+    const projects = querySnapshot.docs.map(doc => ({
+        id: doc.id,  
+        ...doc.data()
+    }));
+
+    console.log(projects); 
+    return projects;
 }
 
 // Get a single project
@@ -43,13 +53,18 @@ export async function deleteProject(projectId) {
 }
 
 // Get all yarn (fetches once, no real-time updates)
-export async function getYarnStash() {
-    const snapshot = await getDocs(yarnCollection)
-    const stash = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-    }))
-    return stash
+export async function getYarnStash(user) {
+    if (!user) {
+        console.log("No user signed in");
+        return;
+    }
+
+    const stashRef = collection(db, "yarn");
+    const q = query(stashRef, where("userId", "==", user.uid)); 
+
+    const querySnapshot = await getDocs(q);
+    const stash = querySnapshot.docs.map(doc => doc.data());
+    return stash;
 }
 
 // Get a single yarn

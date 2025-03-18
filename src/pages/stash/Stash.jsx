@@ -2,11 +2,12 @@ import React from "react"
 import { Link } from "react-router-dom"
 import { useContext } from 'react';
 import { YarnContext } from '../../contexts/YarnContext';
+import { useAuth } from "../../contexts/AuthContext"
 
 export default function Stash() {
     const { yarnStash, loading, error } = useContext(YarnContext)
     const [sortOption, setSortOption] = React.useState("lastUpdated");
-
+    
     const sortedYarn = [...yarnStash].sort((a, b) => {
         switch (sortOption) {
             case "name":
@@ -59,6 +60,7 @@ export default function Stash() {
                 <option value="name">Name</option>
                 <option value="lastUpdated">Last Updated</option>
             </select>
+            
             <div className="stash-list">
                 {yarnElements}
             </div>

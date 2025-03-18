@@ -4,9 +4,10 @@ import { projectsCollection } from "../../api"
 import { doc, getDoc, updateDoc, addDoc, arrayUnion } from "firebase/firestore"
 import { YarnContext } from '../../contexts/YarnContext';
 import { useNavigate, Link, useLocation } from "react-router-dom"
-
+import { useAuth } from "../../contexts/AuthContext"
 
 export default function AddProject() {
+    const { currentUser } = useAuth()
     const { yarnStash } = useContext(YarnContext)
     const navigate = useNavigate()
     const location = useLocation()
@@ -16,7 +17,8 @@ export default function AddProject() {
         status: "",
         yarnUsed: "",
         amountUsed: 0,
-        notes: ""
+        notes: "",
+        userId: currentUser.uid
     })
 
     const [selectedFile, setSelectedFile] = useState(null);

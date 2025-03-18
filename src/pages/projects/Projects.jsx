@@ -1,8 +1,10 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { getProjects } from "../../api"
+import { useAuth } from "../../contexts/AuthContext"
 
 export default function Projects() {
+    const { currentUser } = useAuth();
     const [projects, setProjects] = React.useState([])
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(null)
@@ -12,7 +14,8 @@ export default function Projects() {
         async function loadProjects() {
             setLoading(true)
             try {
-                const data = await getProjects()
+                const data = await getProjects(currentUser)
+                console.log(data)
                 setProjects(data)
             } catch (err) {
                 setError(err)
@@ -67,7 +70,7 @@ export default function Projects() {
                     Add project
                 </button>
             </Link>
-            
+
             <br /> <br />
 
             Sort by:
