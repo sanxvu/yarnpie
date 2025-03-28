@@ -1,6 +1,6 @@
 import { auth } from "./firebase";
-import { db } from "./firebase"; 
-import { doc, setDoc, getDoc } from "firebase/firestore"; 
+import { db } from "./firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -15,8 +15,13 @@ export const doCreateUserWithEmailAndPassword = async (email, password) => {
   return createUserWithEmailAndPassword(auth, email, password);
 };
 
-export const doSignInWithEmailAndPassword = (email, password) => {
-  return signInWithEmailAndPassword(auth, email, password);
+export const doSignInWithEmailAndPassword = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    console.log(userCredential.user)
+  } catch (error) {
+    console.error("Error signing in with email and password:", error.message);
+  }
 };
 
 export const doSignInWithGoogle = async () => {

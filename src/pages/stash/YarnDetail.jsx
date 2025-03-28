@@ -1,34 +1,41 @@
-import React from "react"
+import { useState, useEffect } from "react"
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom"
-import { getYarn, deleteItem } from "../../api"
+import { getYarn, getProject, deleteItem } from "../../api"
 
 export default function YarnDetail() {
-    const [yarn, setYarn] = React.useState(null)
-    const [loading, setLoading] = React.useState(false)
-    const [error, setError] = React.useState(null)
-    const { id } = useParams()
+    const { yarnId } = useParams()
+    const [yarn, setYarn] = useState(null)
+    const [projectDetails, setProjectDetails] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
     const navigate = useNavigate()
     const location = useLocation()
-    
-    React.useEffect(() => {
-        async function fetchYarn() {
+
+    useEffect(() => {
+        async function fetchYarnAndProject() {
             setLoading(true)
             try {
-                const data = await getYarn(id)
+                const data = await getYarn(yarnId)
                 setYarn(data)
+
+                if (data.usedInProjects && Array.isArray(data.usedInProjects)) {
+                    const projectPromises = data.usedInProjects.map(projectId => getProject(projectId));
+                    const projectInfo = await Promise.all(projectPromises);
+                    setProjectDetails(projectInfo);
+                }
             } catch (err) {
                 setError(err)
             } finally {
                 setLoading(false)
             }
         }
-        fetchYarn()
-    }, [id])
+        fetchYarnAndProject()
+    }, [yarnId])
 
     const handleDeleteYarn = async () => {
         setLoading(true)
         try {
-            await deleteItem("yarn", yarn.id, yarn.imagePublicId)
+            await deleteItem("yarn", yarn.id, yarn.image.imagePublicId)
             navigate("/stash", { replace: true });
         }
         catch (err) {
@@ -47,7 +54,7 @@ export default function YarnDetail() {
     }
 
     const search = location.state?.search || "";
-    const type = location.state?.type || "all";
+    //const type = location.state?.type || "all";
 
     return (
         <div className="yarn-detail-container">
@@ -55,11 +62,11 @@ export default function YarnDetail() {
                 to={`..${search}`}
                 relative="path"
                 className="back-button"
-            >&larr; <span>Back to {type} yarn</span></Link>
+            >&larr; <span>Back to Stash</span></Link>
 
             {yarn && (
                 <div className="yarn-detail">
-                    <img src={yarn.image} />
+                    <img src={yarn.image.imageUrl} />
                     <h3>{yarn.name}</h3>
                     <p>Color: {yarn.color}</p>
                     <p>Material: {yarn.material}</p>
@@ -67,22 +74,25 @@ export default function YarnDetail() {
                     <p>Amount per skein: {yarn.amountPerSkein}<span> oz</span></p>
                     <p>Skein Amount: {yarn.skeinAmount}<span> oz</span></p>
                     <p>Used in projects:</p>
-                    <ul>
-                        {yarn.usedInProjects && yarn.usedInProjects.length > 0 ? (
-                            yarn.usedInProjects.map((projectId) => (
-                                <li key={projectId}>
-                                    <Link to={`/projects/${projectId}`}>{projectId}</Link>
+                    {projectDetails.length > 0 ? (
+                        <ul>
+                            {projectDetails.map(project => (
+                                <li key={project.id}>
+                                    <Link to={`/projects/${project.id}`}>{project.name}</Link>
                                 </li>
-                            ))
-                        ) : (
-                            <p>Not used in any projects</p>
-                        )}
-                    </ul>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No projects using ths yarn.</p>
+                    )}
                     <p>Amount available: {yarn.remainingAmount}<span> oz</span></p>
 
                     <Link
-                        to="../editYarn"
-                        state={{ from: location.pathname, yarnId: yarn.id, formData: yarn }}
+                        to={`../editYarn/${yarnId}`}
+                        state={{
+                            from: location.pathname,
+                            yarnFormData: yarn
+                        }}
                     >
                         <button>
                             Edit yarn

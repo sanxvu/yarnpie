@@ -1,35 +1,41 @@
-import React from "react"
+import { useState, useEffect } from "react"
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom"
-import { getProject, deleteItem } from "../../api"
+import { getProject, deleteItem, getYarn } from "../../api"
 
 export default function ProjectDetail() {
-    const [project, setProject] = React.useState(null)
-    const [loading, setLoading] = React.useState(false)
-    const [error, setError] = React.useState(null)
-    const { id } = useParams()
+    const { projectId } = useParams()
+    const [project, setProject] = useState(null)
+    const [yarnDetails, setYarnDetails] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
     const location = useLocation()
     const navigate = useNavigate()
 
-    React.useEffect(() => {
-        async function fetchProject() {
+    useEffect(() => {
+        async function fetchProjectAndYarn() {
             setLoading(true)
             try {
-                const data = await getProject(id)
+                const data = await getProject(projectId)
                 setProject(data)
+
+                if (data.yarnUsed && Array.isArray(data.yarnUsed)) {
+                    const yarnPromises = data.yarnUsed.map(yarnId => getYarn(yarnId));
+                    const yarnInfo = await Promise.all(yarnPromises);
+                    setYarnDetails(yarnInfo);
+                }
             } catch (err) {
                 setError(err)
             } finally {
                 setLoading(false)
             }
         }
-        fetchProject()
-    }, [id])
-
+        fetchProjectAndYarn()
+    }, [projectId])
 
     const handleDeleteProject = async () => {
         setLoading(true)
         try {
-            await deleteItem("project", project.id, project.imagePublicId)
+            await deleteItem("project", project.id, project.image.imagePublicId)
             navigate("/projects", { replace: true });
         }
         catch (err) {
@@ -60,15 +66,29 @@ export default function ProjectDetail() {
 
             {project && (
                 <div className="yarn-detail">
+                    <img src={project.image.imageUrl} />
                     <h3>{project.name}</h3>
                     <p>Status: {project.status}</p>
-                    <p>Yarn Used: {project.yarnUsed}</p>
+
+                    <p>Yarn used:</p>
+                    {yarnDetails.length > 0 ? (
+                        <ul>
+                            {yarnDetails.map(yarn => (
+                                <li key={yarn.id}>
+                                    <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No yarn used for this project</p>
+                    )}
+
                     <p>Amount Used: {project.amountUsed}<span> oz</span></p>
                     <p>Notes: {project.notes}</p>
 
                     <Link
-                        to="../editProject"
-                        state={{ from: location.pathname, projectId: project.id, formData: project }}
+                        to={`../editProject/${project.id}`}
+                        state={{ from: location.pathname, projectFormData: project }}
                     >
                         <button>
                             Edit project

@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react"
-import { useLocation, useNavigate, Link } from "react-router-dom"
+import { useState } from "react"
 import { addDoc } from "firebase/firestore"
 import { yarnCollection } from "../../api"
 import { useAuth } from "../../contexts/AuthContext"
+import YarnForm from "./YarnForm"
 
 export default function AddYarn() {
     const { currentUser } = useAuth()
+    const returnPath = location.state?.from || "/stash";
+
     const [yarnData, setYarnData] = useState(
         {
             name: "",
@@ -14,51 +16,12 @@ export default function AddYarn() {
             weight: "",
             amountPerSkein: 0,
             skeinAmount: 0,
-            image: "",
             usedInProjects: null,
             amountAvailable: 0,
-            userId: currentUser.uid
         }
     )
-    const navigate = useNavigate();
-    const location = useLocation();
-    const returnPath = location.state?.from || "/stash";
-    const [loading, setLoading] = useState(false)
-    const [selectedFile, setSelectedFile] = useState(null)
-    const [preview, setPreview] = useState(null);
 
-    // Update yarnData form if location.state has formData
-    useEffect(() => {
-        console.log(location.state)
-
-        if (location.state?.formData) {
-            setYarnData(location.state.formData);
-        }
-    }, [location.state]);
-
-    function handleChange(event) {
-        const { name, value } = event.target
-        setYarnData(prevYarnData => {
-            return {
-                ...prevYarnData,
-                [name]: value
-            }
-        })
-    }
-
-    function handleFileChange(event) {
-        const file = event.target.files[0];
-        if (file) {
-            setSelectedFile(file);
-            setPreview(URL.createObjectURL(file));
-        }
-    }
-
-    async function handleSubmit(event) {
-        event.preventDefault()
-
-        setLoading(true);
-
+    async function handleAddYarn(yarnData, selectedFile) {
         let imageUrl = "";
         let imagePublicId = "";
 
@@ -76,106 +39,29 @@ export default function AddYarn() {
                 const data = await response.json();
                 imageUrl = data.secure_url;
                 imagePublicId = data.public_id;
-                console.log(data)
+                console.log("Add yarn success:", data)
             } catch (error) {
                 console.error("Image upload error:", error);
-                setLoading(false);
                 return;
             }
         }
 
         const newYarn = {
             ...yarnData,
-            image: imageUrl || "",
-            imagePublicId: imagePublicId,
+            userId: currentUser?.uid || "",
+            image: {
+                imageUrl,
+                imagePublicId,
+            },
             createdAt: Date.now(),
             updatedAt: Date.now(),
             amountAvailable: yarnData.amountPerSkein * yarnData.skeinAmount
         }
 
-        const yarnRef = await addDoc(yarnCollection, newYarn)
-
-        // Return back to Stash or Add Project page
-        navigate(returnPath, {
-            state: {
-                newYarn: {
-                    id: yarnRef.id,
-                    name: yarnData.name
-                },
-                formData: location.state?.formData
-            }
-        })
-    }
-
-    if (loading) {
-        return <h1>Loading...</h1>
+        await addDoc(yarnCollection, newYarn)
     }
 
     return (
-        <div>
-            <Link
-                to={"/stash"}
-                className="back-button"
-            >&larr; <span>Back to Stash</span></Link>
-
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Name"
-                    onChange={handleChange}
-                    name="name"
-                    value={yarnData.name}
-                />
-                <input
-                    type="text"
-                    placeholder="Color"
-                    onChange={handleChange}
-                    name="color"
-                    value={yarnData.color}
-                />
-                <input
-                    type="text"
-                    placeholder="Material"
-                    onChange={handleChange}
-                    name="material"
-                    value={yarnData.material}
-                />
-                <input
-                    type="text"
-                    placeholder="Weight"
-                    onChange={handleChange}
-                    name="weight"
-                    value={yarnData.weight}
-                />
-                <input
-                    type="number"
-                    placeholder="Amount per skein oz"
-                    onChange={handleChange}
-                    name="amountPerSkein"
-                    value={yarnData.amountPerSkein}
-                />
-                <input
-                    type="number"
-                    placeholder="Skein amount"
-                    name="skeinAmount"
-                    onChange={handleChange}
-                    value={yarnData.skeinAmount}
-                />
-
-
-                {/* File Input */}
-                <input type="file" accept="image/*" onChange={handleFileChange} />
-
-                {/* Image Preview */}
-                {preview && <img src={preview} alt="Preview" style={{ width: "100px", marginTop: "10px" }} />}
-
-                <br />
-                <br />
-
-                <button type="submit">
-                    Submit
-                </button>
-            </form>
-        </div>
+        <YarnForm yarnFormData={yarnData} projectFormData={location.state?.projectFormData} onSubmit={handleAddYarn} isEditMode={false} />
     )
 }

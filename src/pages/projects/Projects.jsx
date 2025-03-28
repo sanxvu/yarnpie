@@ -1,31 +1,10 @@
-import React from "react"
+import { useContext, useState } from "react"
+import { ProjectContext } from '../../contexts/ProjectContext';
 import { Link } from "react-router-dom"
-import { getProjects } from "../../api"
-import { useAuth } from "../../contexts/AuthContext"
 
 export default function Projects() {
-    const { currentUser } = useAuth();
-    const [projects, setProjects] = React.useState([])
-    const [loading, setLoading] = React.useState(false)
-    const [error, setError] = React.useState(null)
-    const [sortOption, setSortOption] = React.useState("lastUpdated");
-
-    React.useEffect(() => {
-        async function loadProjects() {
-            setLoading(true)
-            try {
-                const data = await getProjects(currentUser)
-                console.log(data)
-                setProjects(data)
-            } catch (err) {
-                setError(err)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        loadProjects()
-    }, [])
+    const { projects, loading, error } = useContext(ProjectContext)
+    const [sortOption, setSortOption] = useState("lastUpdated");
 
     const sortedProjects = [...projects].sort((a, b) => {
         switch (sortOption) {
@@ -44,8 +23,8 @@ export default function Projects() {
         <Link to={project.id} key={project.id}>
             <div className="yarn-tile">
                 <div className="yarn-info">
-                    <img src={project.image} />
-                    <h3>{project.name ? project.name : "Untitled Project"}</h3>
+                    <img src={project.image.imageUrl} />
+                    <h3>{project.name}</h3>
                     <p>{project.status}</p>
                 </div>
             </div>
@@ -62,27 +41,26 @@ export default function Projects() {
 
     return (
         <div className="stash-container">
-            <h1>Projects</h1>
-            <p>{projectElements.length} projects total</p>
+            <div className="header-container">
+                <Link to="../addProject">
+                    <button className="header-add-button">
+                        Add project
+                    </button>
+                </Link>
+                <p>({projectElements.length} projects total)</p>
 
-            <Link to="../addProject">
-                <button>
-                    Add project
-                </button>
-            </Link>
-
-            <br /> <br />
-
-            Sort by:
-            <select
-                className="projects-filter"
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
-            >
-                <option value="name">Name</option>
-                <option value="lastUpdated">Last Updated</option>
-                <option value="startDate">Start Date</option>
-            </select>
+                <div className="filter-container">
+                    Sort by: 
+                    <select
+                        value={sortOption}
+                        onChange={(e) => setSortOption(e.target.value)}
+                    >
+                        <option value="name">Name</option>
+                        <option value="lastUpdated">Last Updated</option>
+                        <option value="startDate">Start Date</option>
+                    </select>
+                </div>
+            </div>
 
             <div className="stash-list">
                 {projectElements}

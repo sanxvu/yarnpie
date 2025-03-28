@@ -39,26 +39,24 @@ export default function Header() {
                     </>
                 )}
 
-                <NavLink
-                    to="/login"
-                    style={({ isActive }) => (isActive ? activeStyles : null)}
-                >
-                    {userLoggedIn ? (
-                        <button
-                            onClick={() => {
-                                doSignOut().then(() => {
-                                    navigate('/login');
-                                });
-                            }}
-                        >
-                            Logout
-                        </button>
-                    ) : (
-                        <Link to="/login">
-                            Log in / Sign up
-                        </Link>
-                    )}
-                </NavLink>
+                {userLoggedIn ? (
+                    <button
+                        onClick={() => {
+                            doSignOut().then(() => {
+                                navigate('/login');
+                            });
+                        }}
+                    >
+                        Logout
+                    </button>
+                ) : (
+                    <NavLink
+                        to="/login"
+                        style={({ isActive }) => (isActive ? activeStyles : null)}
+                    >
+                        Log in / Sign up
+                    </NavLink>
+                )}
             </nav>
         </header>
     );

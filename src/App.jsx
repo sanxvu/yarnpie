@@ -1,7 +1,8 @@
-import axios from "axios";
-import { useEffect, lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from './contexts/AuthContext'
 import { YarnProvider } from "./contexts/YarnContext";
+import { ProjectProvider } from "./contexts/ProjectContext";
 import Layout from "./components/Layout";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -18,40 +19,37 @@ const EditYarn = lazy(() => import("./pages/stash/EditYarn"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function App() {
-  const fetchAPI = async () => {
-    const response = await axios.get("http://localhost:8080/api")
-    console.log(response.data.fruits)
-  }
-
-  useEffect(() => {
-    fetchAPI()
-  }, [])
   return (
-    <YarnProvider>
-      <BrowserRouter>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="login" element={<Login />} />
-              <Route path="register" element={<Register />} />
+    <BrowserRouter>
+      <AuthProvider>
+        <YarnProvider>
+          <ProjectProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="register" element={<Register />} />
 
-              <Route path="projects" element={<Projects />} />
-              <Route path="projects/:id" element={<ProjectDetail />} />
-              <Route path="addProject" element={<AddProject />} />
-              <Route path="editProject" element={<EditProject />} />
+                  <Route path="projects" element={<Projects />} />
+                  <Route path="projects/:projectId" element={<ProjectDetail />} />
+                  <Route path="addProject" element={<AddProject />} />
+                  <Route path="editProject/:projectId" element={<EditProject />} />
 
-              <Route path="stash" element={<Stash />} />
-              <Route path="stash/:id" element={<YarnDetail />} />
-              <Route path="addYarn" element={<AddYarn />} />
-              <Route path="editYarn" element={<EditYarn />} />
+                  <Route path="stash" element={<Stash />} />
+                  <Route path="stash/:yarnId" element={<YarnDetail />} />
+                  <Route path="addYarn" element={<AddYarn />} />
+                  <Route path="editYarn/:yarnId" element={<EditYarn />} />
 
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </YarnProvider>
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+            </Suspense>
+          </ProjectProvider>
+        </YarnProvider>
+      </AuthProvider>
+    </BrowserRouter>
+
   );
 }
 

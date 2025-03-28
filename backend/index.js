@@ -1,4 +1,4 @@
-require("dotenv").config(); 
+require("dotenv").config();
 const express = require("express")
 const cors = require("cors")
 const admin = require("firebase-admin")
@@ -64,8 +64,25 @@ app.delete("/delete-project/:id", async (req, res) => {
     }
 });
 
+app.delete("/delete-image/", async (req, res) => {
+    const { imagePublicId } = req.body;
+    if (!imagePublicId) {
+        return res.status(400).json({ error: "Missing imagePublicId" });
+    }
+    try {
+        // Delete the image from Cloudinary
+        if (imagePublicId) {
+            await cloudinary.uploader.destroy(imagePublicId);
+        }
+        res.status(200).json({ message: "Image deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting image:", error);
+        res.status(500).json({ error: "Failed to delete image" });
+    }
+})
+
 app.get("/api", (req, res) => {
-    res.json({ "fruits": ["apple", "orange", "banana"] })
+    res.json("Hello, welcome to our API!");
 });
 
 app.listen(8080, () => {

@@ -6,13 +6,13 @@ import './Login.css';
 
 export default function Login() {
     const { userLoggedIn } = useAuth();
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isSigningIn, setIsSigningIn] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
     if (userLoggedIn) {
+        console.log(userLoggedIn)
         return <Navigate to="/projects" replace={true} />;
     }
 
@@ -20,18 +20,34 @@ export default function Login() {
         e.preventDefault();
         if (!isSigningIn) {
             setIsSigningIn(true);
-            await doSignInWithEmailAndPassword(email, password);
-            // doSendEmailVerification()
+            try {
+                await doSignInWithEmailAndPassword(email, password);
+                console.log('Sign-in successful');
+                // Navigate to the projects page after successful sign-in
+                navigate('/projects');
+            } catch (error) {
+                console.error('Sign-in failed', error);
+                setErrorMessage('Failed to sign in. Please check your credentials.');
+            } finally {
+                setIsSigningIn(false);
+            }
         }
     };
 
-    const onGoogleSignIn = (e) => {
+    const onGoogleSignIn = async (e) => {
         e.preventDefault();
         if (!isSigningIn) {
             setIsSigningIn(true);
-            doSignInWithGoogle().catch(err => {
+            try {
+                await doSignInWithGoogle();
+                console.log('Google sign-in successful');
+                navigate('/projects');
+            } catch (err) {
+                console.error('Google sign-in failed', err);
+                setErrorMessage('Failed to sign in with Google. Please try again.');
+            } finally {
                 setIsSigningIn(false);
-            });
+            }
         }
     };
 
@@ -75,6 +91,7 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={isSigningIn}
+                        className="submit-button"
                     >
                         {isSigningIn ? 'Signing In...' : 'Sign In'}
                     </button>
