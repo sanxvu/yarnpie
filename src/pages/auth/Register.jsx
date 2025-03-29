@@ -24,7 +24,6 @@ const Register = () => {
     return (
         <>
             {userLoggedIn && (<Navigate to={'/home'} replace={true} />)}
-
             <main className="register-container">
                 <div className="register-form">
                     <div className="register-header">

@@ -79,18 +79,13 @@ main {
 .home-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  text-align: center;
+  padding: 3rem;
 }
 
 .home-logo {
-  margin: 0px;
-  font-size: 15rem;
-}
-
-@media (max-width: 768px) {
-  .home-logo {
-    font-size: 10rem;
-  }
+  font-family: 'Aztech Forest';
+  font-size: 5rem;
 }
 
 /*** PROJECTS PAGE ***/
