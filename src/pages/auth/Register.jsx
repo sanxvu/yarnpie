@@ -24,8 +24,8 @@ const Register = () => {
     return (
         <>
             {userLoggedIn && (<Navigate to={'/home'} replace={true} />)}
-            <main className="register-container">
-                <div className="register-form">
+            <div className="register-container">
+                <main className="register-form">
                     <div className="register-header">
                         <h3>Create a New Account</h3>
                     </div>
@@ -85,8 +85,8 @@ const Register = () => {
                             <Link to={'/login'} className="link">Continue</Link>
                         </div>
                     </form>
-                </div>
-            </main>
+                </main>
+            </div>
         </>
     )
 }
