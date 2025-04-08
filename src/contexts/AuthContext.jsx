@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
         } else {
             setCurrentUser(null);
             setUserLoggedIn(false);
-            navigate("/login");
+            navigate("/home");
         }
 
         setLoading(false);
