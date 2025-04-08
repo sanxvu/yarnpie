@@ -1,5 +1,5 @@
 import React from "react"
-
+import projectsScreenshot from "../assets/projects-screenshot.png"
 
 export default function Home() {
     return (
@@ -8,7 +8,7 @@ export default function Home() {
             <div className="home-logo">yarnies</div>
             <p>Keep track of your bajillion WIPs and all the yarn you keep buying.</p>
             <br /><br />
-            <img src="src/assets/projects-screenshot.png" />
+            <img src={projectsScreenshot} alt="projects screenshot" />
         </div>
     )
 };
