@@ -106,7 +106,16 @@ nav {
 }
 
 .filter-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-left: auto;
+}
+
+select {
+  border: 1px solid gray;
+  border-radius: .5rem;
+  padding: .5rem;
 }
 
 .yarn-detail-container {
@@ -127,15 +136,15 @@ nav {
 
 .stash-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, 300px);
-  gap: 5rem;
-  grid-auto-rows: 350px;
-  margin-top: 2rem;
+  justify-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  grid-auto-rows: 28rem;
+  margin-top: 3rem;
 }
 
 .yarn-tile {
-  width: 250px;
-  height: 350px;
+  width: 13rem;
+  height: 20rem;
   background: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 10px;

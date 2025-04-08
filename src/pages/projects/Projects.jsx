@@ -45,7 +45,6 @@ export default function Projects() {
                 <h1>Projects</h1>
                 <h4>({projectElements.length} projects total)</h4>
                 <div className="filter-container">
-                    Sort by:
                     <select
                         value={sortOption}
                         onChange={(e) => setSortOption(e.target.value)}
