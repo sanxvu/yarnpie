@@ -82,6 +82,12 @@ nav {
   text-align: center;
 }
 
+.home-container>img {
+  border: .5px solid;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 .home-logo {
   font-family: 'Aztech Forest';
   font-size: 5rem;
