@@ -24,8 +24,8 @@ export default function Projects() {
             <div className="yarn-tile">
                 <div className="yarn-info">
                     <img src={project.image.imageUrl} />
-                    <h3>{project.name}</h3>
-                    <p>{project.status}</p>
+                    <h2>{project.name}</h2>
+                    <p>{project.updatedAt}</p>
                 </div>
             </div>
         </Link>
@@ -42,15 +42,10 @@ export default function Projects() {
     return (
         <div className="stash-container">
             <div className="header-container">
-                <Link to="../addProject">
-                    <button className="header-add-button">
-                        Add project
-                    </button>
-                </Link>
-                <p>({projectElements.length} projects total)</p>
-
+                <h1>Projects</h1>
+                <h4>({projectElements.length} projects total)</h4>
                 <div className="filter-container">
-                    Sort by: 
+                    Sort by:
                     <select
                         value={sortOption}
                         onChange={(e) => setSortOption(e.target.value)}
@@ -61,6 +56,12 @@ export default function Projects() {
                     </select>
                 </div>
             </div>
+
+            <Link to="../addProject">
+                <button className="header-add-button">
+                    + Add project
+                </button>
+            </Link>
 
             <div className="stash-list">
                 {projectElements}

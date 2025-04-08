@@ -41,6 +41,14 @@ export default function AddProject() {
             }
         }
 
+        const now = Date.now();
+        const date = new Date(now);
+        const longDateFormat = date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
         const newProject = {
             ...projectData,
             userId: currentUser?.uid || "",
@@ -48,8 +56,8 @@ export default function AddProject() {
                 imageUrl,
                 imagePublicId,
             },
-            createdAt: Date.now(),
-            updatedAt: Date.now()
+            createdAt: longDateFormat,
+            updatedAt: longDateFormat
         }
 
         const projectRef = await addDoc(projectsCollection, newProject)
