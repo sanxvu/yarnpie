@@ -22,7 +22,7 @@
 html,
 body {
   margin: 0;
-  padding: 1rem;
+  padding: 0;
 }
 
 h1 {
@@ -80,6 +80,7 @@ nav {
   display: flex;
   flex-direction: column;
   text-align: center;
+  padding: 2rem;
 }
 
 .home-container>img {
@@ -124,16 +125,55 @@ select {
   padding: .5rem;
 }
 
-.yarn-detail-container {
+/*** DETAIL PAGE ***/
+.detail-container {
+  padding: 2rem;
+}
+
+.detail {
   margin-top: 2rem;
 }
 
-.yarn-detail>img {
+.detail>img {
   width: 15rem;
   height: 15rem;
   border-radius: 10px;
   object-fit: cover;
 }
+
+/*** FORM PAGE ***//* 
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  padding: 2rem;
+}
+
+.add-edit-form {
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  text-align: left;
+  background-color: white;
+}
+
+fieldset {
+  border-radius: .5rem;
+  border: 1px solid #d1d5db;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  text-align: left;
+} */
 
 /*** STASH PAGE ***/
 .stash-container {

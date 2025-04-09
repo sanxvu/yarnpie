@@ -56,55 +56,52 @@ export default function ProjectDetail() {
     const search = location.state?.search || "";
 
     return (
-        <div>
+
+        <div className="detail-container">
             <Link
                 to={`..${search}`}
                 relative="path"
                 className="back-button"
             >&larr; <span>Back to projects</span></Link>
 
+            {project && (
+                <div className="detail">
+                    <img src={project.image.imageUrl} />
+                    <h2>{project.name}</h2>
+                    <p>Status: {project.status}</p>
+                    <p>Last updated: {project.updatedAt}</p>
+                    <p>Created on: {project.createdAt}</p>
+                    <p>Yarn used:</p>
+                    {yarnDetails.length > 0 ? (
+                        <ul>
+                            {yarnDetails.map(yarn => (
+                                <li key={yarn.id}>
+                                    <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No yarn used for this project</p>
+                    )}
 
-            <div className="yarn-detail-container">
+                    <p>Amount Used: {project.amountUsed}<span> oz</span></p>
+                    <p>Notes: {project.notes}</p>
 
-                {project && (
-                    <div className="yarn-detail">
-                        <img src={project.image.imageUrl} />
-                        <h2>{project.name}</h2>
-                        <p>Status: {project.status}</p>
-                        <p>Last updated: {project.updatedAt}</p>
-                        <p>Created on: {project.createdAt}</p>
-                        <p>Yarn used:</p>
-                        {yarnDetails.length > 0 ? (
-                            <ul>
-                                {yarnDetails.map(yarn => (
-                                    <li key={yarn.id}>
-                                        <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>No yarn used for this project</p>
-                        )}
-
-                        <p>Amount Used: {project.amountUsed}<span> oz</span></p>
-                        <p>Notes: {project.notes}</p>
-
-                        <Link
-                            to={`../editProject/${project.id}`}
-                            state={{ from: location.pathname, projectFormData: project }}
-                        >
-                            <button>
-                                Edit project
-                            </button>
-                        </Link>
-
-                        <button onClick={() => handleDeleteProject()}>
-                            Delete project
+                    <Link
+                        to={`../editProject/${project.id}`}
+                        state={{ from: location.pathname, projectFormData: project }}
+                    >
+                        <button>
+                            Edit project
                         </button>
+                    </Link>
 
-                    </div>
-                )}
-            </div>
+                    <button onClick={() => handleDeleteProject()}>
+                        Delete project
+                    </button>
+
+                </div>
+            )}
         </div>
     )
 }

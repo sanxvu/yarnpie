@@ -3,6 +3,8 @@ import { useNavigate, Link, useLocation } from "react-router-dom"
 import { YarnContext } from '../../contexts/YarnContext';
 import { deleteImage } from "../../api"
 import FileInput from "../../components/FileInput"
+import '../../components/Form.css';
+import Select from "react-select";
 
 export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
     const navigate = useNavigate()
@@ -62,147 +64,130 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
             setLoading(false)
             navigate(returnPath)
         }
-
     }
 
+    // Transform yarn stash into options
+    const yarnOptions = yarnStash.map(yarn => ({
+        value: yarn.id,
+        label: yarn.name
+    }));
+
+    const handleYarnChange = (selectedOptions) => {
+        setProjectData(prevProjectData => ({
+            ...prevProjectData,
+            yarnUsed: selectedOptions.map(option => option.value),
+        }));
+    };
+
     return (
-        <div>
+        <div className="form-container">
             <Link
                 to={"/projects"}
                 className="back-button"
             >&larr; <span>Back to Projects</span></Link>
+            
+            <main className="add-edit-form">
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="name">Project Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={projectData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
 
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Name"
-                    onChange={handleChange}
-                    name="name"
-                    value={projectData.name}
-                    required
-                />
+                    <div className="form-fieldset-group">
+                        <label htmlFor="status-fieldset">Status</label>
+                        <fieldset id="status-fieldset">
+                            {["Work In Progress", "Completed", "Abandoned", "Frogged"].map(status => {
+                                const id = status.toLowerCase().replace(/\s+/g, '');
+                                return (
+                                    <div key={id} className="radio-option">
+                                        <input
+                                            type="radio"
+                                            id={id}
+                                            name="status"
+                                            value={status}
+                                            checked={projectData.status === status}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                        <label htmlFor={id}>{status}</label>
+                                    </div>
+                                );
+                            })}
+                        </fieldset>
+                    </div>
 
-                <fieldset>
-                    <legend>Status</legend>
+                    <div className="form-group">
+                        <label htmlFor="yarnUsed">Select yarn:</label>
+                        <Select
+                            id="yarnUsed"
+                            isMulti
+                            name="yarnUsed"
+                            options={yarnOptions}
+                            value={projectData.yarnUsed.map(yarnId => yarnOptions.find(opt => opt.value === yarnId))}
+                            onChange={handleYarnChange}
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                        />
+                        <Link
+                            to="../addYarn"
+                            state={{
+                                from: location.pathname,
+                                projectFormData: projectData,
+                                selectedFile,
+                                preview
+                            }}
+                        >
+                            or Add New Yarn
+                        </Link>
+                    </div>
 
-                    <input
-                        type="radio"
-                        id="workInProgress"
-                        name="status"
-                        value="Work In Progress"
-                        checked={projectData.status === "Work In Progress"}
-                        onChange={handleChange}
-                        required
-                    />
-                    <label htmlFor="workInProgress">Work in Progress</label>
-                    <br />
+                    <div className="form-group">
+                        <label htmlFor="amountUsed">Amount used (oz): </label>
+                        <input
+                            type="number"
+                            onChange={handleChange}
+                            name="amountUsed"
+                            id="amountUsed"
+                            value={projectData.amountUsed}
+                        />
+                    </div>
 
-                    <input
-                        type="radio"
-                        id="completed"
-                        name="status"
-                        value="Completed"
-                        checked={projectData.status === "Completed"}
-                        onChange={handleChange}
-                    />
-                    <label htmlFor="completed">Completed</label>
-                    <br />
+                    <div className="form-group">
+                        <label htmlFor="notes">Notes: </label>
+                        <textarea
+                            onChange={handleChange}
+                            name="notes"
+                            id="notes"
+                            value={projectData.notes}
+                        />
+                    </div>
 
-                    <input
-                        type="radio"
-                        id="abandoned"
-                        name="status"
-                        value="Abandoned"
-                        checked={projectData.status === "Abandoned"}
-                        onChange={handleChange}
-                    />
-                    <label htmlFor="abandoned">Abandoned</label>
-                    <br />
+                    <div className="form-group">
+                        <label htmlFor="file-input">Set cover picture: </label>
+                        <FileInput
+                            id="file-input"
+                            selectedFile={selectedFile}
+                            preview={preview}
+                            setSelectedFile={setSelectedFile}
+                            setPreview={setPreview}
+                            imageRemoved={imageRemoved}
+                            setImageRemoved={setImageRemoved}
+                        />
+                    </div>
 
-                    <input
-                        type="radio"
-                        id="frogged"
-                        name="status"
-                        value="Frogged"
-                        checked={projectData.status === "Frogged"}
-                        onChange={handleChange}
-                    />
-                    <label htmlFor="frogged">Frogged</label>
-                    <br />
-                </fieldset>
-                <br />
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Saving..." : isEditMode ? "Update Project" : "Add Project"}
+                    </button>
 
-                <label htmlFor="yarnUsed">Select yarn: </label>
-                <br />
-                <select
-                    id="yarnUsed"
-                    multiple
-                    value={projectData.yarnUsed}
-                    onChange={handleChange}
-                    name="yarnUsed"
-                    required
-                >
-                    {yarnStash.map(yarn => (
-                        <option key={yarn.id} value={yarn.id}>
-                            {yarn.name}
-                        </option>
-                    ))}
-                </select>
-                <Link
-                    to="../addYarn"
-                    state={{
-                        from: location.pathname,
-                        projectFormData: projectData,
-                        selectedFile,
-                        preview
-                    }}
-                >
-                    or <u>Add New Yarn</u>
-                </Link>
-
-                <br />
-                <br />
-
-                <label htmlFor="amountUsed">Amount used: </label>
-                <input
-                    type="number"
-                    placeholder="Amount used oz"
-                    onChange={handleChange}
-                    name="amountUsed"
-                    id="amountUsed"
-                    value={projectData.amountUsed}
-                />
-
-                <br />
-                <br />
-
-                <label htmlFor="notes">Notes: </label>
-                <textarea
-                    placeholder="Notes"
-                    onChange={handleChange}
-                    name="notes"
-                    id="notes"
-                    value={projectData.notes}
-                />
-
-                <br /><br />
-
-                <FileInput
-                    selectedFile={selectedFile}
-                    preview={preview}
-                    setSelectedFile={setSelectedFile}
-                    setPreview={setPreview}
-                    imageRemoved={imageRemoved}
-                    setImageRemoved={setImageRemoved}
-                />
-
-                <br /><br />
-
-                <button type="submit" disabled={loading}>
-                    {loading ? "Saving..." : isEditMode ? "Update Project" : "Add Project"}
-                </button>
-
-            </form>
+                </form>
+            </main>
         </div>
     )
 }

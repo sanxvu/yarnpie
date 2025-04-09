@@ -27,7 +27,7 @@
     color: #4b5563;
 }
 
-.form-group {
+.form-group, .form-fieldset-group {
     margin-bottom: 1.5rem;
 }
 
@@ -37,6 +37,7 @@
     font-weight: 500;
     color: #6b7280;
     margin-bottom: 0.5rem;
+    text-align: left;
 }
 
 .form-group input {

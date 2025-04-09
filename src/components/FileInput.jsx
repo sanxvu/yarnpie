@@ -37,9 +37,17 @@ export default function FileInput({ selectedFile, preview, setSelectedFile, setP
 
             {/* Preview current image */}
             {currentPreview && (
-                <div>
-                    <img src={currentPreview} alt="Current Yarn" style={{ width: "100px", marginTop: "10px" }} />
-                    <button type="button" onClick={() => handleRemoveImage()}>Remove Image</button>
+                <div className="image-preview-container">
+                    <img
+                        src={currentPreview}
+                        alt="Current Yarn"
+                        className="image-preview" />
+                    <button
+                        type="button"
+                        onClick={() => handleRemoveImage()}
+                        className="remove-image-button">
+                        Remove Image
+                    </button>
                 </div>
             )}
         </div>

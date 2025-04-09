@@ -57,7 +57,7 @@ export default function YarnDetail() {
     //const type = location.state?.type || "all";
 
     return (
-        <div className="yarn-detail-container">
+        <div className="detail-container">
             <Link
                 to={`..${search}`}
                 relative="path"
@@ -65,7 +65,7 @@ export default function YarnDetail() {
             >&larr; <span>Back to Stash</span></Link>
 
             {yarn && (
-                <div className="yarn-detail">
+                <div className="detail">
                     <img src={yarn.image.imageUrl} />
                     <h3>{yarn.name}</h3>
                     <p>Color: {yarn.color}</p>

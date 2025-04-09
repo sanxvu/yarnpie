@@ -39,25 +39,26 @@ export default function Stash() {
 
     return (
         <div className="stash-container">
-            <h1>Stash</h1>
-            <p>{yarnElements.length} yarn total</p>
+            <div className="header-container">
+                <h1>Stash</h1>
+                <h4>({yarnElements.length} yarn total)</h4>
+                <div className="filter-container">
+                    <select
+                        className="projects-filter"
+                        value={sortOption}
+                        onChange={(e) => setSortOption(e.target.value)}
+                    >
+                        <option value="name">Name</option>
+                        <option value="lastUpdated">Last Updated</option>
+                    </select>
+                </div>
+            </div>
 
             <Link to="../addYarn">
-                <button>
-                    Add yarn
+                <button className="header-add-button">
+                    + Add yarn
                 </button>
             </Link>
-            <br /> <br />
-
-            Sort by:
-            <select
-                className="projects-filter"
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
-            >
-                <option value="name">Name</option>
-                <option value="lastUpdated">Last Updated</option>
-            </select>
 
             <div className="stash-list">
                 {yarnElements}
