@@ -13,8 +13,8 @@
 }
 
 @font-face {
-  font-family: 'Aztech Forest';
-  src: url('/fonts/AztechForest-9YJa0.otf') format('opentype');
+  font-family: "Aztech Forest";
+  src: url("/fonts/AztechForest-9YJa0.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
 }
@@ -83,14 +83,14 @@ nav {
   padding: 2rem;
 }
 
-.home-container>img {
-  border: .5px solid;
+.home-container > img {
+  border: 0.5px solid;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .home-logo {
-  font-family: 'Aztech Forest';
+  font-family: "Aztech Forest";
   font-size: 5rem;
 }
 
@@ -121,8 +121,8 @@ nav {
 
 select {
   border: 1px solid gray;
-  border-radius: .5rem;
-  padding: .5rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
 }
 
 /*** DETAIL PAGE ***/
@@ -134,14 +134,14 @@ select {
   margin-top: 2rem;
 }
 
-.detail>img {
+.detail > img {
   width: 15rem;
   height: 15rem;
   border-radius: 10px;
   object-fit: cover;
 }
 
-/*** FORM PAGE ***//* 
+/*** FORM PAGE ***/ /* 
 .form-container {
   display: flex;
   flex-direction: column;
@@ -202,7 +202,7 @@ label {
   padding: 40px;
 }
 
-.yarn-info>img {
+.yarn-info > img {
   width: 15rem;
   height: 15rem;
   border-radius: 10px;

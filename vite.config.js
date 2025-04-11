@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   build: {
@@ -9,9 +9,9 @@ export default defineConfig({
           if (id.includes("node_modules")) {
             return "vendor";
           }
-        }
-      }
-    }
+        },
+      },
+    },
   },
-  plugins: [react()]
-})
+  plugins: [react()],
+});

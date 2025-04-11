@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from './contexts/AuthContext'
+import { AuthProvider } from "./contexts/AuthContext";
 import { StashProvider } from "./contexts/StashContext";
 import { ProjectsProvider } from "./contexts/ProjectsContext";
 import Layout from "./components/Layout";
@@ -32,9 +32,15 @@ function App() {
                   <Route path="register" element={<Register />} />
 
                   <Route path="projects" element={<Projects />} />
-                  <Route path="projects/:projectId" element={<ProjectDetail />} />
+                  <Route
+                    path="projects/:projectId"
+                    element={<ProjectDetail />}
+                  />
                   <Route path="addProject" element={<AddProject />} />
-                  <Route path="editProject/:projectId" element={<EditProject />} />
+                  <Route
+                    path="editProject/:projectId"
+                    element={<EditProject />}
+                  />
 
                   <Route path="stash" element={<Stash />} />
                   <Route path="stash/:yarnId" element={<YarnDetail />} />
@@ -49,8 +55,7 @@ function App() {
         </StashProvider>
       </AuthProvider>
     </BrowserRouter>
-
   );
 }
 
-export default App
+export default App;

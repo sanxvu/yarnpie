@@ -1,70 +1,66 @@
-import { useContext, useState } from "react"
-import { ProjectsContext } from '../../contexts/ProjectsContext';
-import { Link } from "react-router-dom"
+import { useContext, useState } from "react";
+import { ProjectsContext } from "../../contexts/ProjectsContext";
+import { Link } from "react-router-dom";
 
 export default function Projects() {
-    const { projects, loading, error } = useContext(ProjectsContext)
-    const [sortOption, setSortOption] = useState("lastUpdated");
+  const { projects, loading, error } = useContext(ProjectsContext);
+  const [sortOption, setSortOption] = useState("lastUpdated");
 
-    const sortedProjects = [...projects].sort((a, b) => {
-        switch (sortOption) {
-            case "name":
-                return a.name.localeCompare(b.name)
-            case "lastUpdated":
-                return b.updatedAt - a.updatedAt
-            case "startDate":
-                return b.createdAt - a.createdAt
-            default:
-                return 0
-        }
-    })
-
-    const projectElements = sortedProjects.map(project => (
-        <Link to={project.id} key={project.id}>
-            <div className="yarn-tile">
-                <div className="yarn-info">
-                    <img src={project.image.imageUrl} />
-                    <h2>{project.name}</h2>
-                    <p>{project.updatedAt}</p>
-                </div>
-            </div>
-        </Link>
-    ))
-
-    if (loading) {
-        return <h1>Loading...</h1>
+  const sortedProjects = [...projects].sort((a, b) => {
+    switch (sortOption) {
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "lastUpdated":
+        return b.updatedAt - a.updatedAt;
+      case "startDate":
+        return b.createdAt - a.createdAt;
+      default:
+        return 0;
     }
+  });
 
-    if (error) {
-        return <h1>There was an error: {error.message}</h1>
-    }
-
-    return (
-        <div className="stash-container">
-            <div className="header-container">
-                <h1>Projects</h1>
-                <h4>({projectElements.length} projects total)</h4>
-                <div className="filter-container">
-                    <select
-                        value={sortOption}
-                        onChange={(e) => setSortOption(e.target.value)}
-                    >
-                        <option value="name">Name</option>
-                        <option value="lastUpdated">Last Updated</option>
-                        <option value="startDate">Start Date</option>
-                    </select>
-                </div>
-            </div>
-
-            <Link to="../addProject">
-                <button className="header-add-button">
-                    + Add project
-                </button>
-            </Link>
-
-            <div className="stash-list">
-                {projectElements}
-            </div>
+  const projectElements = sortedProjects.map((project) => (
+    <Link to={project.id} key={project.id}>
+      <div className="yarn-tile">
+        <div className="yarn-info">
+          <img src={project.image.imageUrl} />
+          <h2>{project.name}</h2>
+          <p>{project.updatedAt}</p>
         </div>
-    )
+      </div>
+    </Link>
+  ));
+
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+
+  if (error) {
+    return <h1>There was an error: {error.message}</h1>;
+  }
+
+  return (
+    <div className="stash-container">
+      <div className="header-container">
+        <h1>Projects</h1>
+        <h4>({projectElements.length} projects total)</h4>
+        <div className="filter-container">
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+          >
+            <option value="name">Name</option>
+            <option value="lastUpdated">Last Updated</option>
+            <option value="startDate">Start Date</option>
+          </select>
+        </div>
+      </div>
+
+      <Link to="../addProject">
+        <button className="header-add-button">+ Add project</button>
+      </Link>
+
+      <div className="stash-list">{projectElements}</div>
+    </div>
+  );
 }

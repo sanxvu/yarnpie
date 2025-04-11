@@ -17,8 +17,12 @@ export const doCreateUserWithEmailAndPassword = async (email, password) => {
 
 export const doSignInWithEmailAndPassword = async (email, password) => {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    console.log(userCredential.user)
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
+    console.log(userCredential.user);
   } catch (error) {
     console.error("Error signing in with email and password:", error.message);
   }
@@ -28,7 +32,7 @@ export const doSignInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
   const result = await signInWithPopup(auth, provider);
   const user = result.user;
-  console.log(user)
+  console.log(user);
 
   // Add user to Firestore if not already added
   const userDocRef = doc(db, "users", user.uid); // Use user's UID as document ID
