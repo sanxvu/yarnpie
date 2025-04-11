@@ -1,9 +1,9 @@
 import { useContext, useState } from "react"
-import { ProjectContext } from '../../contexts/ProjectContext';
+import { ProjectsContext } from '../../contexts/ProjectsContext';
 import { Link } from "react-router-dom"
 
 export default function Projects() {
-    const { projects, loading, error } = useContext(ProjectContext)
+    const { projects, loading, error } = useContext(ProjectsContext)
     const [sortOption, setSortOption] = useState("lastUpdated");
 
     const sortedProjects = [...projects].sort((a, b) => {

@@ -18,11 +18,18 @@ export default function YarnDetail() {
                 const data = await getYarn(yarnId)
                 setYarn(data)
 
-                if (data.usedInProjects && Array.isArray(data.usedInProjects)) {
-                    const projectPromises = data.usedInProjects.map(projectId => getProject(projectId));
-                    const projectInfo = await Promise.all(projectPromises);
-                    setProjectDetails(projectInfo);
-                }
+                // Fetch yarn details based on the project'syarnUsed yarnIds
+                const projects = await Promise.all(
+                    data.usedInProjects.map(async (item) => {
+                        const projectData = await getProject(item.projectId)
+                        return {
+                            ...projectData,
+                            amountUsed: item.amount // Bring in the amount used from project
+                        }
+                    })
+                )
+                setProjectDetails(projects)
+
             } catch (err) {
                 setError(err)
             } finally {
@@ -74,11 +81,11 @@ export default function YarnDetail() {
                     <p>Amount per skein: {yarn.amountPerSkein}<span> oz</span></p>
                     <p>Skein Amount: {yarn.skeinAmount}<span> oz</span></p>
                     <p>Used in projects:</p>
-                    {projectDetails.length > 0 ? (
+                    {yarn.usedInProjects && yarn.usedInProjects.length > 0 ? (
                         <ul>
                             {projectDetails.map(project => (
                                 <li key={project.id}>
-                                    <Link to={`/projects/${project.id}`}>{project.name}</Link>
+                                    <Link to={`/projects/${project.id}`}>{project.name}</Link> – {project.amountUsed} oz used
                                 </li>
                             ))}
                         </ul>

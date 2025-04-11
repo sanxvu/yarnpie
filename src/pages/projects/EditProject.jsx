@@ -30,11 +30,7 @@ export default function EditProject() {
         let imageUrl = "";
         let imagePublicId = "";
 
-        if (!updatedData.yarnUsed) {
-            alert("Please select a yarn.")
-            return
-        }
-
+        // Upload image if provided
         if (selectedFile) {
             const formData = new FormData();
             formData.append("file", selectedFile);
@@ -47,14 +43,22 @@ export default function EditProject() {
                     body: formData,
                 });
                 const data = await response.json();
-                imageUrl = data.secure_url; // Get image URL
-                imagePublicId = data.public_id; //Get public_id 
+                imageUrl = data.secure_url;
+                imagePublicId = data.public_id;
                 console.log("Edit project image success", data)
             } catch (error) {
                 console.error("Image upload error:", error);
                 return;
             }
         }
+
+        const now = Date.now();
+        const date = new Date(now);
+        const longDateFormat = date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
 
         // Update project
         const docRef = doc(db, "projects", projectId)
@@ -63,24 +67,38 @@ export default function EditProject() {
             image: {
                 imageUrl,
                 imagePublicId,
-            }
+            },
+            updatedAt: longDateFormat
         })
 
-        // Update yarn's usedInProjects and remainingAmount
-        for (const yarnId of projectData.yarnUsed) {
-            const yarnRef = doc(db, "yarn", yarnId)
-            const yarnSnap = await getDoc(yarnRef)
+        // Update each yarn's usedInProjects and remainingAmount
+        for (const yarnData of projectData.yarnUsed) {
+            const { yarnId, amount } = yarnData;
+            const yarnRef = doc(db, "yarn", yarnId);
+            const yarnSnap = await getDoc(yarnRef);
 
-            if (yarnSnap.exists()) {
-                const yarnData = yarnSnap.data();
-                const totalAvailable = yarnData.skeinAmount * yarnData.amountPerSkein;
-                const newRemainingAmount = totalAvailable - updatedData.amountUsed;
+            const yarnData = yarnSnap.data();
 
-                await updateDoc(yarnRef, {
-                    remainingAmount: newRemainingAmount,
-                    usedInProjects: arrayUnion(projectId)
-                });
-            }
+            // Remove any previous entry for this project
+            const updatedUsedInProjects = (yarnData.usedInProjects || []).filter(
+                entry => entry.projectId !== projectId
+            );
+
+            // Add the new one
+            updatedUsedInProjects.push({
+                projectId,
+                amount: Number(amount),
+            });
+
+            // Recalculate remainingAmount
+            const totalAvailable = yarnData.skeinAmount * yarnData.amountPerSkein;
+            const totalUsed = updatedUsedInProjects.reduce((sum, entry) => sum + entry.amount, 0);
+            const newRemaining = totalAvailable - totalUsed;
+
+            await updateDoc(yarnRef, {
+                usedInProjects: updatedUsedInProjects,
+                remainingAmount: newRemaining,
+            });
         }
     }
 

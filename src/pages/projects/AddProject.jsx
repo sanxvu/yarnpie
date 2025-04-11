@@ -20,6 +20,7 @@ export default function AddProject() {
         let imageUrl = "";
         let imagePublicId = "";
 
+        // Upload image if provided
         if (selectedFile) {
             const formData = new FormData();
             formData.append("file", selectedFile);
@@ -49,6 +50,7 @@ export default function AddProject() {
             day: 'numeric'
         });
 
+        // Create new project data
         const newProject = {
             ...projectData,
             userId: currentUser?.uid || "",
@@ -60,22 +62,27 @@ export default function AddProject() {
             updatedAt: longDateFormat
         }
 
+        // Add the new project to Firestore
         const projectRef = await addDoc(projectsCollection, newProject)
         const projectId = projectRef.id
 
         // Update each yarn's usedInProjects and remainingAmount
-        for (const yarnId of projectData.yarnUsed) {
+        for (const yarnData of projectData.yarnUsed) {
+            const { yarnId, amount } = yarnData;
             const yarnRef = doc(db, "yarn", yarnId);
             const yarnSnap = await getDoc(yarnRef);
 
             if (yarnSnap.exists()) {
-                const yarnData = yarnSnap.data();
-                const totalAvailable = yarnData.skeinAmount * yarnData.amountPerSkein;
-                const newRemainingAmount = totalAvailable - projectData.amountUsed;
+                const yarnInfo = yarnSnap.data();
+                const totalAvailable = yarnInfo.skeinAmount * yarnInfo.amountPerSkein;
+                const newRemainingAmount = totalAvailable - amount;
+
+                // Store projectId AND amount used in this yarn
+                const usedEntry = { projectId, amount: Number(amount) };
 
                 await updateDoc(yarnRef, {
                     remainingAmount: newRemainingAmount,
-                    usedInProjects: arrayUnion(projectId)
+                    usedInProjects: arrayUnion(usedEntry)
                 });
             }
         }

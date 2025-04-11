@@ -1,9 +1,9 @@
 import { useContext, useState } from "react"
-import { YarnContext } from '../../contexts/YarnContext';
+import { StashContext } from '../../contexts/StashContext';
 import { Link } from "react-router-dom"
 
 export default function Stash() {
-    const { yarnStash, loading, error } = useContext(YarnContext)
+    const { yarnStash, loading, error } = useContext(StashContext)
     const [sortOption, setSortOption] = useState("lastUpdated");
 
     const sortedYarn = [...yarnStash].sort((a, b) => {

@@ -19,11 +19,13 @@ export default function YarnForm({ yarnFormData, projectFormData, onSubmit, isEd
     // Update yarnData form if location.state has yarnFormData
     useEffect(() => {
         if (location.state?.yarnFormData) {
-            setYarnData(location.state.yarnFormData);
-            if (yarnData.image?.imageUrl) {
-                setPreview(yarnData.image.imageUrl);
+            const formData = location.state.yarnFormData;
+            setYarnData(formData);
+            if (formData.image?.imageUrl) {
+                setPreview(formData.image.imageUrl);
             }
         }
+
     }, [location.state, yarnData]);
 
     function handleChange(event) {

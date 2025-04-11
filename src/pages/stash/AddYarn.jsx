@@ -6,7 +6,6 @@ import YarnForm from "./YarnForm"
 
 export default function AddYarn() {
     const { currentUser } = useAuth()
-    const returnPath = location.state?.from || "/stash";
 
     const [yarnData, setYarnData] = useState(
         {
@@ -16,7 +15,7 @@ export default function AddYarn() {
             weight: "",
             amountPerSkein: 0,
             skeinAmount: 0,
-            usedInProjects: null,
+            usedInProjects: [],
             amountAvailable: 0,
         }
     )
@@ -25,6 +24,7 @@ export default function AddYarn() {
         let imageUrl = "";
         let imagePublicId = "";
 
+         // Upload image if provided
         if (selectedFile) {
             const formData = new FormData();
             formData.append("file", selectedFile);
@@ -46,6 +46,15 @@ export default function AddYarn() {
             }
         }
 
+        const now = Date.now();
+        const date = new Date(now);
+        const longDateFormat = date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Create new yarn data
         const newYarn = {
             ...yarnData,
             userId: currentUser?.uid || "",
@@ -53,11 +62,12 @@ export default function AddYarn() {
                 imageUrl,
                 imagePublicId,
             },
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
+            createdAt: longDateFormat,
+            updatedAt: longDateFormat,
             amountAvailable: yarnData.amountPerSkein * yarnData.skeinAmount
         }
 
+        // Add the new yarn to Firestore
         await addDoc(yarnCollection, newYarn)
     }
 

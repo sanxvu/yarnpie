@@ -17,7 +17,7 @@ export default function EditYarn() {
             amountPerSkein: 0,
             skeinAmount: 0,
             image: "",
-            usedInProjects: null,
+            usedInProjects: [],
             amountAvailable: 0
         }
     )
@@ -34,9 +34,10 @@ export default function EditYarn() {
 
     async function handleEditYarn(yarnData, selectedFile) {
 
-        let imageUrl = yarnData.imageUrl || "";
-        let imagePublicId = yarnData.imagePublicId || "";
+        let imageUrl = "";
+        let imagePublicId = "";
 
+        // Upload image if provided
         if (selectedFile) {
             const formData = new FormData();
             formData.append("file", selectedFile);
@@ -54,10 +55,17 @@ export default function EditYarn() {
                 console.log("Edit yarn image success", data)
             } catch (error) {
                 console.error("Image upload error:", error);
-                setLoading(false);
                 return;
             }
-        } 
+        }
+
+        const now = Date.now();
+        const date = new Date(now);
+        const longDateFormat = date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
 
         // Update yarn 
         const docRef = doc(db, "yarn", yarnId)
@@ -69,6 +77,7 @@ export default function EditYarn() {
                     imageUrl,
                     imagePublicId,
                 },
+                updatedAt: longDateFormat
             }
         )
     }

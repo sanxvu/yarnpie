@@ -2,9 +2,9 @@ import { createContext, useState, useEffect } from 'react';
 import { getProjects } from '../api';
 import { useAuth } from "./AuthContext"
 
-export const ProjectContext = createContext();
+export const ProjectsContext = createContext();
 
-export const ProjectProvider = ({ children }) => {
+export const ProjectsProvider = ({ children }) => {
     const { currentUser } = useAuth();
     const [projects, setProjects] = useState([])
     const [loading, setLoading] = useState(true);
@@ -34,8 +34,8 @@ export const ProjectProvider = ({ children }) => {
     if (loading) return <p>Loading projects...</p>;
 
     return (
-        <ProjectContext.Provider value={{ projects, setProjects, loading, error }}>
+        <ProjectsContext.Provider value={{ projects, setProjects, loading, error }}>
             {children}
-        </ProjectContext.Provider>
+        </ProjectsContext.Provider>
     );
 };

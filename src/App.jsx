@@ -1,8 +1,8 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from './contexts/AuthContext'
-import { YarnProvider } from "./contexts/YarnContext";
-import { ProjectProvider } from "./contexts/ProjectContext";
+import { StashProvider } from "./contexts/StashContext";
+import { ProjectsProvider } from "./contexts/ProjectsContext";
 import Layout from "./components/Layout";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -22,8 +22,8 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <YarnProvider>
-          <ProjectProvider>
+        <StashProvider>
+          <ProjectsProvider>
             <Suspense fallback={<div>Loading...</div>}>
               <Routes>
                 <Route path="/" element={<Layout />}>
@@ -45,8 +45,8 @@ function App() {
                 </Route>
               </Routes>
             </Suspense>
-          </ProjectProvider>
-        </YarnProvider>
+          </ProjectsProvider>
+        </StashProvider>
       </AuthProvider>
     </BrowserRouter>
 

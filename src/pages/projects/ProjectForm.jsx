@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from "react-router-dom"
-import { YarnContext } from '../../contexts/YarnContext';
+import { StashContext } from '../../contexts/StashContext';
 import { deleteImage } from "../../api"
 import FileInput from "../../components/FileInput"
 import '../../components/Form.css';
@@ -12,7 +12,7 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
     const returnPath = location.state?.from || "/projects";
     const [loading, setLoading] = useState(false);
 
-    const { yarnStash } = useContext(YarnContext)
+    const { yarnStash } = useContext(StashContext)
     const [projectData, setProjectData] = useState(projectFormData);
 
     const [selectedFile, setSelectedFile] = useState(null);
@@ -22,25 +22,32 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
     // Update projectData if location.state has projectFormData
     useEffect(() => {
         if (location.state?.projectFormData) {
-            setProjectData(location.state.projectFormData);
-            if (projectData.image?.imageUrl) {
-                setPreview(projectData.image.imageUrl);
+            const formData = location.state.projectFormData;
+            setProjectData(formData);
+    
+            if (formData.image?.imageUrl) {
+                setPreview(formData.image.imageUrl);
             }
         }
-    }, [location.state, projectData]);
+    }, [location.state]);    
 
     function handleChange(event) {
-        const { name, value } = event.target
+        const { name, value } = event.target;
+
         if (name === "yarnUsed") {
-            const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
-            setProjectData(prevProjectData => ({
+            const selectedOptions = Array.from(event.target.selectedOptions, (option) => ({
+                yarnId: option.value,
+                amount: 0
+            }));
+
+            setProjectData((prevProjectData) => ({
                 ...prevProjectData,
-                yarnUsed: selectedOptions
+                yarnUsed: selectedOptions,
             }));
         } else {
-            setProjectData(prevProjectData => ({
+            setProjectData((prevProjectData) => ({
                 ...prevProjectData,
-                [name]: value
+                [name]: value,
             }));
         }
     }
@@ -55,7 +62,6 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
                 console.log("Removing image with public ID:", projectData.image.imagePublicId); // Debug log
                 await deleteImage(projectData.image.imagePublicId);
             }
-
             // Pass updated form data to onSubmit
             await onSubmit(projectData, selectedFile)
         } catch (error) {
@@ -66,17 +72,18 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
         }
     }
 
-    // Transform yarn stash into options
+    // Handle the React Select multi-select component
     const yarnOptions = yarnStash.map(yarn => ({
         value: yarn.id,
         label: yarn.name
     }));
 
     const handleYarnChange = (selectedOptions) => {
-        setProjectData(prevProjectData => ({
-            ...prevProjectData,
-            yarnUsed: selectedOptions.map(option => option.value),
-        }));
+        const updatedYarns = selectedOptions.map(option => {
+            const existing = projectData.yarnUsed.find(y => y.yarnId === option.value);
+            return existing || { yarnId: option.value, amount: 0 };  
+        });
+        setProjectData(prev => ({ ...prev, yarnUsed: updatedYarns }));
     };
 
     return (
@@ -85,7 +92,7 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
                 to={"/projects"}
                 className="back-button"
             >&larr; <span>Back to Projects</span></Link>
-            
+
             <main className="add-edit-form">
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -130,11 +137,12 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
                             isMulti
                             name="yarnUsed"
                             options={yarnOptions}
-                            value={projectData.yarnUsed.map(yarnId => yarnOptions.find(opt => opt.value === yarnId))}
+                            value={projectData.yarnUsed.map(yarn => yarnOptions.find(opt => opt.value === yarn.yarnId))}
                             onChange={handleYarnChange}
                             className="react-select-container"
                             classNamePrefix="react-select"
                         />
+
                         <Link
                             to="../addYarn"
                             state={{
@@ -146,17 +154,32 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
                         >
                             or Add New Yarn
                         </Link>
-                    </div>
 
-                    <div className="form-group">
-                        <label htmlFor="amountUsed">Amount used (oz): </label>
-                        <input
-                            type="number"
-                            onChange={handleChange}
-                            name="amountUsed"
-                            id="amountUsed"
-                            value={projectData.amountUsed}
-                        />
+                        {/* Specify amount used for each yarn used */}
+                        {projectData.yarnUsed.map((yarn, index) => {
+                            const yarnInfo = yarnStash.find(y => y.id === yarn.yarnId);
+                            return (
+                                <div key={yarn.yarnId} className="form-group">
+                                    <label>
+                                        {yarnInfo?.name || "Yarn"} - Amount used (oz):
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.1"
+                                            value={yarn.amount}
+                                            onChange={(e) => {
+                                                const newAmount = parseFloat(e.target.value);
+                                                setProjectData(prev => {
+                                                    const updated = [...prev.yarnUsed];
+                                                    updated[index] = { ...updated[index], amount: newAmount };
+                                                    return { ...prev, yarnUsed: updated };
+                                                });
+                                            }}
+                                        />
+                                    </label>
+                                </div>
+                            );
+                        })}
                     </div>
 
                     <div className="form-group">

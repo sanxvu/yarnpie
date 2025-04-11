@@ -18,11 +18,18 @@ export default function ProjectDetail() {
                 const data = await getProject(projectId)
                 setProject(data)
 
-                if (data.yarnUsed && Array.isArray(data.yarnUsed)) {
-                    const yarnPromises = data.yarnUsed.map(yarnId => getYarn(yarnId));
-                    const yarnInfo = await Promise.all(yarnPromises);
-                    setYarnDetails(yarnInfo);
-                }
+                // Fetch yarn details based on the project's yarnUsed yarnIds
+                const yarns = await Promise.all(
+                    data.yarnUsed.map(async (item) => {
+                        const yarnData = await getYarn(item.yarnId)
+                        return {
+                            ...yarnData,
+                            amountUsed: item.amount 
+                        }
+                    })
+                )
+                setYarnDetails(yarns)
+
             } catch (err) {
                 setError(err)
             } finally {
@@ -71,19 +78,14 @@ export default function ProjectDetail() {
                     <p>Status: {project.status}</p>
                     <p>Last updated: {project.updatedAt}</p>
                     <p>Created on: {project.createdAt}</p>
-                    <p>Yarn used:</p>
-                    {yarnDetails.length > 0 ? (
-                        <ul>
-                            {yarnDetails.map(yarn => (
-                                <li key={yarn.id}>
-                                    <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>No yarn used for this project</p>
-                    )}
-
+                    <p>Yarn used: </p>
+                    <ul>
+                        {yarnDetails.map(yarn => (
+                            <li key={yarn.id}>
+                                <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link> – {yarn.amountUsed} oz used
+                            </li>
+                        ))}
+                    </ul>
                     <p>Amount Used: {project.amountUsed}<span> oz</span></p>
                     <p>Notes: {project.notes}</p>
 

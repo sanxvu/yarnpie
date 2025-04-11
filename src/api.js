@@ -5,6 +5,18 @@ import axios from "axios"
 export const yarnCollection = collection(db, "yarn")
 export const projectsCollection = collection(db, "projects")
 
+// One-time fetch of projects - used in StashContext to calculate yarn usage
+export async function fetchProjects(user) {
+    const projectsRef = collection(db, "projects");
+    const q = query(projectsRef, where("userId", "==", user.uid));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+}
+
+// Real-time projects update 
 export async function getProjects(user, callback) {
     if (!user) {
         console.error("No user is logged in.");
@@ -59,6 +71,11 @@ export async function getProject(id) {
 export async function getYarn(id) {
     const docRef = doc(db, "yarn", id)
     const snapshot = await getDoc(docRef)
+
+    if (!snapshot.exists()) {
+        throw new Error("Yarn not found");
+    }
+
     return {
         ...snapshot.data(),
         id: snapshot.id
