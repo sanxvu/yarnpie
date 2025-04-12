@@ -36,7 +36,7 @@ export default function EditProject() {
       formData.append("file", selectedFile);
       formData.append(
         "upload_preset",
-        import.meta.env.VITE_CLOUDINARY_PRESET_NAME,
+        import.meta.env.VITE_CLOUDINARY_PRESET_NAME
       );
       formData.append("cloud_name", import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
 
@@ -46,7 +46,7 @@ export default function EditProject() {
           {
             method: "POST",
             body: formData,
-          },
+          }
         );
         const data = await response.json();
         imageUrl = data.secure_url;
@@ -83,14 +83,19 @@ export default function EditProject() {
       const yarnRef = doc(db, "yarn", yarnId);
       const yarnSnap = await getDoc(yarnRef);
 
-      const yarnData = yarnSnap.data();
+      if (!yarnSnap.exists()) {
+        console.warn(`Yarn ${yarnId} not found, skipping update`);
+        continue;
+      }
 
-      // Remove any previous entry for this project
-      const updatedUsedInProjects = (yarnData.usedInProjects || []).filter(
-        (entry) => entry.projectId !== projectId,
+      const yarn = yarnSnap.data();
+
+      // Remove previous entry for this project
+      const updatedUsedInProjects = (yarn.usedInProjects || []).filter(
+        (entry) => entry.projectId !== projectId
       );
 
-      // Add the new one
+      // Add updated entry
       updatedUsedInProjects.push({
         projectId,
         amount: Number(amount),
@@ -100,7 +105,7 @@ export default function EditProject() {
       const totalAvailable = yarnData.skeinAmount * yarnData.amountPerSkein;
       const totalUsed = updatedUsedInProjects.reduce(
         (sum, entry) => sum + entry.amount,
-        0,
+        0
       );
       const newRemaining = totalAvailable - totalUsed;
 

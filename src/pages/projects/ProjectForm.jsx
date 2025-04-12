@@ -40,7 +40,7 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
         (option) => ({
           yarnId: option.value,
           amount: 0,
-        }),
+        })
       );
 
       setProjectData((prevProjectData) => ({
@@ -64,7 +64,7 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
       if (isEditMode && imageRemoved && projectData.image?.imagePublicId) {
         console.log(
           "Removing image with public ID:",
-          projectData.image.imagePublicId,
+          projectData.image.imagePublicId
         ); // Debug log
         await deleteImage(projectData.image.imagePublicId);
       }
@@ -87,7 +87,7 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
   const handleYarnChange = (selectedOptions) => {
     const updatedYarns = selectedOptions.map((option) => {
       const existing = projectData.yarnUsed.find(
-        (y) => y.yarnId === option.value,
+        (y) => y.yarnId === option.value
       );
       return existing || { yarnId: option.value, amount: 0 };
     });
@@ -134,7 +134,7 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
                       <label htmlFor={id}>{status}</label>
                     </div>
                   );
-                },
+                }
               )}
             </fieldset>
           </div>
@@ -147,7 +147,7 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
               name="yarnUsed"
               options={yarnOptions}
               value={projectData.yarnUsed.map((yarn) =>
-                yarnOptions.find((opt) => opt.value === yarn.yarnId),
+                yarnOptions.find((opt) => opt.value === yarn.yarnId)
               )}
               onChange={handleYarnChange}
               className="react-select-container"

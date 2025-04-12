@@ -96,8 +96,8 @@ export const deleteItem = async (itemType, itemId, imagePublicId) => {
     const response = await axios.delete(
       `http://localhost:8080/delete-${itemType}/${itemId}`,
       {
-        data: { imagePublicId: imagePublicId || null },
-      },
+        data: imagePublicId ? { imagePublicId } : {},
+      }
     );
     console.log("Yarn/project and image deleted:", response.data);
     return response.data;

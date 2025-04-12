@@ -93,7 +93,7 @@ export default function YarnDetail() {
               ))}
             </ul>
           ) : (
-            <p>No projects using ths yarn.</p>
+            <li>No projects using ths yarn.</li>
           )}
           <p>
             Amount available: {yarn.remainingAmount}

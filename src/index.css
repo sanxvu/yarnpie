@@ -41,13 +41,13 @@ a {
 }
 
 .site-wrapper {
-  min-height: 100vh;
+  min-height: calc(100vh - 6rem);
   display: flex;
   flex-direction: column;
 }
 
 header {
-  height: 110px;
+  height: 6rem;
   display: flex;
   align-items: center;
 }
@@ -56,7 +56,9 @@ header .site-logo {
   margin-right: auto;
   color: black;
   font-family: "Aztech Forest";
-  font-size: 30px;
+  font-size: 2rem;
+  margin-top: 0.75rem;
+  margin-left: 1rem
 }
 
 header a {
@@ -73,6 +75,7 @@ header a:hover {
 
 nav {
   display: flex;
+  padding: 1rem;
 }
 
 /*** HOME PAGE ***/
@@ -81,12 +84,18 @@ nav {
   flex-direction: column;
   text-align: center;
   padding: 2rem;
+  background-color: #FFe6ee;
+}
+
+.home-header {
+  padding: 3rem;
 }
 
 .home-container > img {
   border: 0.5px solid;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 5rem;
 }
 
 .home-logo {

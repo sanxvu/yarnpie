@@ -21,12 +21,24 @@ export default function ProjectDetail() {
         // Fetch yarn details based on the project's yarnUsed yarnIds
         const yarns = await Promise.all(
           data.yarnUsed.map(async (item) => {
-            const yarnData = await getYarn(item.yarnId);
-            return {
-              ...yarnData,
-              amountUsed: item.amount,
-            };
-          }),
+            try {
+              const yarnData = await getYarn(item.yarnId);
+              return {
+                ...yarnData,
+                amountUsed: item.amount,
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching yarn with ID ${item.yarnId}:`,
+                error
+              );
+              return {
+                id: item.yarnId,
+                name: "Missing Yarn", // Placeholder for missing yarn
+                amountUsed: item.amount,
+              };
+            }
+          })
         );
         setYarnDetails(yarns);
       } catch (err) {
@@ -75,12 +87,15 @@ export default function ProjectDetail() {
           <p>Created on: {project.createdAt}</p>
           <p>Yarn used: </p>
           <ul>
-            {yarnDetails.map((yarn) => (
-              <li key={yarn.id}>
-                <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link> –{" "}
-                {yarn.amountUsed} oz used
-              </li>
-            ))}
+            {yarnDetails.length > 0 ? (
+              yarnDetails.map((yarn) => (
+                <li key={yarn.id}>
+                  <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link> - {yarn.amountUsed} oz used
+                </li>
+              ))
+            ) : (
+              <li>No yarn used for this project</li>
+            )}
           </ul>
           <p>
             Amount Used: {project.amountUsed}

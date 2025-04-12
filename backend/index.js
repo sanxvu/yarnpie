@@ -36,18 +36,18 @@ app.delete("/delete-yarn/:id", async (req, res) => {
     }
 
     const yarnData = yarnSnap.data();
+    const usedInProjects = yarnData.usedInProjects || [];
+
+    console.log(`Deleting yarn ${yarnId}`);
+    console.log("Used in projects:", usedInProjects);
 
     // Step 1: Update each related projects's yarnUsed field
-    const projectUpdatePromises = yarnData.usedInProjects.map(
-      async (projectEntry) => {
-        const projectRef = db
-          .collection("projects")
-          .doc(projectEntry.projectId);
-        await projectRef.update({
-          yarnUsed: admin.firestore.FieldValue.arrayRemove(yarnId),
-        });
-      },
-    );
+    const projectUpdatePromises = usedInProjects.map(async (projectEntry) => {
+      const projectRef = db.collection("projects").doc(projectEntry.projectId);
+      await projectRef.update({
+        yarnUsed: admin.firestore.FieldValue.arrayRemove(yarnId),
+      });
+    });
 
     await Promise.all(projectUpdatePromises);
 
@@ -70,7 +70,7 @@ app.delete("/delete-yarn/:id", async (req, res) => {
 });
 
 // Delete project (and image if included) and update yarn's usedInProjects
-app.delete("/delete-project/:id", async (req, res) => {
+app.delete("/delete-project/:id", async (req, res) => {  
   const projectId = req.params.id;
   const { imagePublicId } = req.body;
 
@@ -85,7 +85,9 @@ app.delete("/delete-project/:id", async (req, res) => {
     const projectData = projectSnap.data();
 
     // Step 1: Update each related yarn's usedInProjects field
-    const yarnUpdatePromises = projectData.yarnUsed.map(async (yarnEntry) => {
+    const yarnUsed = projectData.yarnUsed || [];
+
+    const yarnUpdatePromises = yarnUsed.map(async (yarnEntry) => {
       const yarnRef = db.collection("yarn").doc(yarnEntry.yarnId);
       await yarnRef.update({
         usedInProjects: admin.firestore.FieldValue.arrayRemove(projectId),
