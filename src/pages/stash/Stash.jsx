@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { StashContext } from "../../contexts/StashContext";
 import { Link } from "react-router-dom";
-import yarnies from "../../assets/yarnies-pic.png"
+import yarnpie from "../../assets/yarnpie.jpg"
 
 export default function Stash() {
   const { yarnStash, loading, error } = useContext(StashContext);
@@ -22,7 +22,7 @@ export default function Stash() {
     <Link to={yarn.id} key={yarn.id}>
       <div className="yarn-tile">
         <div className="yarn-info">
-          <img src={yarn.image.imageUrl ? yarn.iamge.imageUrl : yarnies}></img>
+          <img src={yarn.image.imageUrl ? yarn.iamge.imageUrl : yarnpie}></img>
           <h2>{yarn.name}</h2>
           <p>Remaining: {yarn.remainingAmount} oz</p>
         </div>

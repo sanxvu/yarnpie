@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { getYarn, getProject, deleteItem } from "../../api";
+import yarnpie from "../../assets/yarnpie.jpg"
 
 export default function YarnDetail() {
   const { yarnId } = useParams();
@@ -69,7 +70,7 @@ export default function YarnDetail() {
 
       {yarn && (
         <div className="detail">
-          <img src={yarn.image.imageUrl} />
+          <img src={yarn.image.imageUrl ? yarn.image.imageUrl : yarnpie} />
           <h3>{yarn.name}</h3>
           <p>Color: {yarn.color}</p>
           <p>Material: {yarn.material}</p>

@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { ProjectsContext } from "../../contexts/ProjectsContext";
 import { Link } from "react-router-dom";
-import yarnies from "../../assets/yarnies-pic.png"
+import yarnpie from "../../assets/yarnpie.jpg"
 
 export default function Projects() {
   const { projects, loading, error } = useContext(ProjectsContext);
@@ -24,7 +24,7 @@ export default function Projects() {
     <Link to={project.id} key={project.id}>
       <div className="yarn-tile">
         <div className="yarn-info">
-          <img src={project.image.imageUrl ? project.image.imageUrl : yarnies} />
+          <img src={project.image.imageUrl ? project.image.imageUrl : yarnpie} />
           <h2>{project.name}</h2>
           <p>{project.updatedAt}</p>
         </div>

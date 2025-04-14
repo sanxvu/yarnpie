@@ -58,7 +58,7 @@ header .site-logo {
   font-family: "Aztech Forest";
   font-size: 2rem;
   margin-top: 0.75rem;
-  margin-left: 1rem
+  margin-left: 1rem;
 }
 
 header a {
@@ -84,11 +84,13 @@ nav {
   flex-direction: column;
   text-align: center;
   padding: 2rem;
-  background-color: #FFe6ee;
+  background-color: #fcf7f1;
 }
 
 .home-header {
-  padding: 3rem;
+  padding: 7rem;
+  font-size: 2rem;
+  text-align: left;
 }
 
 .home-container > img {

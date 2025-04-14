@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { getProject, deleteItem, getYarn } from "../../api";
+import yarnpie from "../../assets/yarnpie.jpg"
 
 export default function ProjectDetail() {
   const { projectId } = useParams();
@@ -80,7 +81,7 @@ export default function ProjectDetail() {
 
       {project && (
         <div className="detail">
-          <img src={project.image.imageUrl} />
+          <img src={project.image.imageUrl ? project.image.imageUrl : yarnpie} />
           <h2>{project.name}</h2>
           <p>Status: {project.status}</p>
           <p>Last updated: {project.updatedAt}</p>
