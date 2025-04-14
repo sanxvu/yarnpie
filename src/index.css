@@ -83,12 +83,13 @@ nav {
   display: flex;
   flex-direction: column;
   text-align: center;
+  justify-items: center;
   padding: 2rem;
   background-color: #fcf7f1;
 }
 
 .home-header {
-  padding: 7rem;
+  padding: 2rem;
   font-size: 1.5rem;
   text-align: left;
 }
