@@ -89,9 +89,9 @@ nav {
 }
 
 .home-header {
-  padding: 2rem;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   text-align: left;
+  margin-bottom: 3rem;
 }
 
 .home-container > img {
