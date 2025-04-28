@@ -15,7 +15,6 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
 
   if (userLoggedIn) {
-    console.log(userLoggedIn);
     return <Navigate to="/projects" replace={true} />;
   }
 

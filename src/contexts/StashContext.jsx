@@ -27,15 +27,16 @@ export const StashProvider = ({ children }) => {
               const projects = await fetchProjects(currentUser);
               const updatedStashWithUsage = calculateYarnUsage(
                 updatedStash,
-                projects,
+                projects
               );
+              console.log(updatedStashWithUsage)
               setYarnStash(updatedStashWithUsage);
               setLoading(false);
             } catch (err) {
               setError(err);
               setLoading(false);
             }
-          },
+          }
         );
 
         return () => unsubscribeStash();
@@ -64,17 +65,18 @@ function calculateYarnUsage(stash, projects) {
   projects.forEach((project) => {
     project.yarnUsed?.forEach(({ yarnId, amount }) => {
       if (!usageMap[yarnId]) usageMap[yarnId] = 0;
-      usageMap[yarnId] += Number(amount);
+      usageMap[yarnId] += amount;
+      console.log(`Yarn ID: ${yarnId}, Amount: ${amount}, Total: ${usageMap[yarnId]}`);
     });
   });
 
   return stash.map((yarn) => {
     const used = usageMap[yarn.id] || 0;
-    const total = Number(yarn.totalAmount || 0);
+    const total = yarn.amountPerSkein * yarn.skeinAmount;
     return {
       ...yarn,
       usedAmount: used,
-      remainingAmount: Math.max(0, total - used),
+      remainingAmount: total - used,
     };
   });
 }

@@ -11,13 +11,17 @@ export default function Home() {
           yarn stash and projects — all in one place. Whether you're the type to
           hoard the softest skeins, start ten projects at once, or you're just
           starting out, Yarnpie helps you:
-          <ul>
-            <li>
-              🌸 <b>Organize your yarn stash</b> with photos, fiber details, and
-              yardage.
-            </li>
-            <li>🧵 <b>Track your projects</b> and how much yarn you've used. </li>
-          </ul>
+        </p>
+        <ul>
+          <li>
+            🌸 <b>Organize your yarn stash</b> with photos, fiber details, and
+            yardage.
+          </li>
+          <li>
+            🧵 <b>Track your projects</b> and how much yarn you've used.{" "}
+          </li>
+        </ul>
+        <p>
           Inspired by the magpie's instinct to gather beautiful things, Yarnpie
           brings a touch of charm to staying organized. No spreadsheets, no
           stress — just a more delightful way to manage your making.

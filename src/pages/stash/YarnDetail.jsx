@@ -19,7 +19,7 @@ export default function YarnDetail() {
         const data = await getYarn(yarnId);
         setYarn(data);
 
-        // Fetch yarn details based on the project'syarnUsed yarnIds
+        // Fetch yarn details based on the project's yarnUsed yarnIds
         const projects = await Promise.all(
           data.usedInProjects.map(async (item) => {
             const projectData = await getProject(item.projectId);

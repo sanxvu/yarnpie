@@ -98,10 +98,6 @@ export default function ProjectDetail() {
               <li>No yarn used for this project</li>
             )}
           </ul>
-          <p>
-            Amount Used: {project.amountUsed}
-            <span> oz</span>
-          </p>
           <p>Notes: {project.notes}</p>
 
           <Link

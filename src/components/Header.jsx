@@ -17,7 +17,7 @@ export default function Header() {
   return (
     <header>
       <Link className="site-logo" to="/">
-        Yarnpie
+        yarnpie
       </Link>
 
       <nav>
