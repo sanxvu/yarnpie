@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
 import { StashContext } from "../../contexts/StashContext";
 import { Link } from "react-router-dom";
-import yarnpie from "../../assets/yarnpie.jpg"
+import yarnpie from "../../assets/yarnpie.jpg";
 
 export default function Stash() {
-  const { yarnStash, loading, error } = useContext(StashContext);
+  const { yarnStash, error } = useContext(StashContext);
   const [sortOption, setSortOption] = useState("lastUpdated");
 
   const sortedYarn = [...yarnStash].sort((a, b) => {
@@ -29,10 +29,6 @@ export default function Stash() {
       </div>
     </Link>
   ));
-
-  if (loading) {
-    return <h1>Loading...</h1>;
-  }
 
   if (error) {
     return <h1>There was an error: {error.message}</h1>;

@@ -4,6 +4,8 @@ import { getProject, deleteItem, getYarn } from "../../api";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import yarnpie from "../../assets/yarnpie.jpg";
+import Spinner from "../../components/Spinner";
+import "../../components/Spinner.css";
 
 export default function ProjectDetail() {
   const { projectId } = useParams();
@@ -55,11 +57,14 @@ export default function ProjectDetail() {
 
   const handleDeleteProject = async () => {
     // Create warning message about yarn amounts being restored
-    const yarnWarning = yarnDetails.length > 0
-      ? `\n\nThis project uses the following yarns:\n${yarnDetails
-          .map(yarn => `- ${yarn.name} (${yarn.amountUsed} oz)`)
-          .join('\n')}\n\nDeleting this project will restore these amounts back to your yarn stash.`
-      : "";
+    const yarnWarning =
+      yarnDetails.length > 0
+        ? `\n\nThis project uses the following yarns:\n${yarnDetails
+            .map((yarn) => `- ${yarn.name} (${yarn.amountUsed} oz)`)
+            .join(
+              "\n"
+            )}\n\nDeleting this project will restore these amounts back to your yarn stash.`
+        : "";
 
     const confirmDelete = window.confirm(
       `Are you sure you want to delete this project? This action cannot be undone.${yarnWarning}`
@@ -70,17 +75,19 @@ export default function ProjectDetail() {
 
     try {
       // First update all affected yarns to remove this project and restore amounts
-      await Promise.all(yarnDetails.map(async (yarn) => {
-        // Remove this project from the yarn's usedInProjects array
-        const updatedUsedInProjects = yarn.usedInProjects.filter(
-          project => project.projectId !== projectId
-        );
+      await Promise.all(
+        yarnDetails.map(async (yarn) => {
+          // Remove this project from the yarn's usedInProjects array
+          const updatedUsedInProjects = yarn.usedInProjects.filter(
+            (project) => project.projectId !== projectId
+          );
 
-        // Update the yarn document - fixed collection name from "yarns" to "yarn"
-        await updateDoc(doc(db, "yarn", yarn.id), {
-          usedInProjects: updatedUsedInProjects
-        });
-      }));
+          // Update the yarn document - fixed collection name from "yarns" to "yarn"
+          await updateDoc(doc(db, "yarn", yarn.id), {
+            usedInProjects: updatedUsedInProjects,
+          });
+        })
+      );
 
       // Then delete the project
       await deleteItem("project", project.id, project.image.imagePublicId);
@@ -91,10 +98,6 @@ export default function ProjectDetail() {
       setLoading(false);
     }
   };
-
-  if (loading) {
-    return <h1>Loading...</h1>;
-  }
 
   if (error) {
     return <h1>There was an error: {error.message}</h1>;
@@ -118,18 +121,18 @@ export default function ProjectDetail() {
           <p>Last updated: {project.updatedAt}</p>
           <p>Created on: {project.createdAt}</p>
           <p>Yarn used: </p>
-          <ul>
-            {yarnDetails.length > 0 ? (
-              yarnDetails.map((yarn) => (
-                <li key={yarn.id}>
-                  <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link> -{" "}
-                  {yarn.amountUsed} oz used
-                </li>
-              ))
-            ) : (
-              <li>No yarn used for this project</li>
-            )}
-          </ul>
+          {loading ? (
+            <li></li>
+          ) : yarnDetails.length > 0 ? (
+            yarnDetails.map((yarn) => (
+              <li key={yarn.id}>
+                <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link> -{" "}
+                {yarn.amountUsed} oz used
+              </li>
+            ))
+          ) : (
+            <li>No yarn used for this project</li>
+          )}
           <p>Notes: {project.notes}</p>
 
           <Link

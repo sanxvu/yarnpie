@@ -8,12 +8,10 @@ export const StashProvider = ({ children }) => {
   const { currentUser } = useAuth();
   const [yarnStash, setYarnStash] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!currentUser) {
-      setLoading(false);
       setYarnStash([]);
       return;
     }
@@ -22,7 +20,6 @@ export const StashProvider = ({ children }) => {
     let unsubscribeProjects;
 
     async function loadStashAndProjects() {
-      setLoading(true);
       try {
         unsubscribeStash = getYarnStash(currentUser, (updatedStash) => {
           setYarnStash(updatedStash);
@@ -34,11 +31,8 @@ export const StashProvider = ({ children }) => {
             setProjects(updatedProjects);
           }
         );
-
-        setLoading(false);
       } catch (err) {
         setError(err);
-        setLoading(false);
       }
     }
     loadStashAndProjects();
@@ -51,11 +45,9 @@ export const StashProvider = ({ children }) => {
 
   const calculatedStash = calculateYarnUsage(yarnStash, projects);
 
-  if (loading) return <p>Loading stash...</p>;
-
   return (
     <StashContext.Provider
-      value={{ yarnStash: calculatedStash, setYarnStash, loading, error }}
+      value={{ yarnStash: calculatedStash, setYarnStash, error }}
     >
       {children}
     </StashContext.Provider>

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import yarnpie from "../../assets/yarnpie.jpg"
 
 export default function Projects() {
-  const { projects, loading, error } = useContext(ProjectsContext);
+  const { projects, error } = useContext(ProjectsContext);
   const [sortOption, setSortOption] = useState("lastUpdated");
 
   const sortedProjects = [...projects].sort((a, b) => {
@@ -31,10 +31,6 @@ export default function Projects() {
       </div>
     </Link>
   ));
-
-  if (loading) {
-    return <h1>Loading...</h1>;
-  }
 
   if (error) {
     return <h1>There was an error: {error.message}</h1>;

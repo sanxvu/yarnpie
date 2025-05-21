@@ -2,13 +2,13 @@ import { useState, useContext, useEffect } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { StashContext } from "../../contexts/StashContext";
 import { ProjectsContext } from "../../contexts/ProjectsContext";
-import { getProject, deleteItem } from "../../api";
+import { deleteItem } from "../../api";
 import yarnpie from "../../assets/yarnpie.jpg";
 
 export default function YarnDetail() {
   const { yarnId } = useParams();
   const { projects } = useContext(ProjectsContext);
-  const { yarnStash, loading, error } = useContext(StashContext);
+  const { yarnStash, error } = useContext(StashContext);
   const [projectDetails, setProjectDetails] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,15 +22,17 @@ export default function YarnDetail() {
         try {
           // Map through the usedInProjects array to get project details
           const projectsData = yarn.usedInProjects.map((item) => {
-            const projectData = projects.find(p => p.id === item.projectId);
-            return projectData ? {
-              ...projectData,
-              amountUsed: item.amount
-            } : {
-              id: item.projectId,
-              name: "Deleted Project",
-              amountUsed: item.amount
-            };
+            const projectData = projects.find((p) => p.id === item.projectId);
+            return projectData
+              ? {
+                  ...projectData,
+                  amountUsed: item.amount,
+                }
+              : {
+                  id: item.projectId,
+                  name: "Deleted Project",
+                  amountUsed: item.amount,
+                };
           });
           setProjectDetails(projectsData);
         } catch (err) {
@@ -57,10 +59,6 @@ export default function YarnDetail() {
     } finally {
     }
   };
-
-  if (loading) {
-    return <h1>Loading...</h1>;
-  }
 
   if (error) {
     return <h1>There was an error: {error.message}</h1>;
