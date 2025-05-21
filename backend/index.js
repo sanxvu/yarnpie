@@ -89,8 +89,24 @@ app.delete("/delete-project/:id", async (req, res) => {
 
     const yarnUpdatePromises = yarnUsed.map(async (yarnEntry) => {
       const yarnRef = db.collection("yarn").doc(yarnEntry.yarnId);
+      const yarnDoc = await yarnRef.get();
+      const yarnData = yarnDoc.data();
+      
+      // Filter out the project from usedInProjects
+      const updatedUsedInProjects = yarnData.usedInProjects.filter(
+        entry => entry.projectId !== projectId
+      );
+      
+      // Recalculate remaining amount
+      const totalAvailable = yarnData.skeinAmount * yarnData.amountPerSkein;
+      const totalUsed = updatedUsedInProjects.reduce(
+        (sum, entry) => sum + entry.amount, 
+        0
+      );
+      
       await yarnRef.update({
-        usedInProjects: admin.firestore.FieldValue.arrayRemove(projectId),
+        usedInProjects: updatedUsedInProjects,
+        remainingAmount: totalAvailable - totalUsed
       });
     });
 

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { db } from "../../firebase/firebase";
 import { projectsCollection } from "../../api";
-import { doc, getDoc, updateDoc, addDoc, arrayUnion } from "firebase/firestore";
+import { doc, runTransaction, collection } from "firebase/firestore";
 import { useAuth } from "../../contexts/AuthContext";
 import ProjectForm from "./ProjectForm";
 
 export default function AddProject() {
   const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const [projectData, setProjectData] = useState({
     name: "",
@@ -17,82 +18,106 @@ export default function AddProject() {
   });
 
   async function handleAddProject(projectData, selectedFile) {
+    setLoading(true);
     let imageUrl = "";
     let imagePublicId = "";
 
-    // Upload image if provided
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      formData.append(
-        "upload_preset",
-        import.meta.env.VITE_CLOUDINARY_PRESET_NAME,
-      );
-      formData.append("cloud_name", import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+    try {
+      // Handle image upload first if there's a file
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_PRESET_NAME);
+        formData.append("cloud_name", import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
 
-      try {
         const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${
-            import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-          }/image/upload`,
+          `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
           {
             method: "POST",
             body: formData,
-          },
+          }
         );
         const data = await response.json();
-        imageUrl = data.secure_url; // Get image URL
-        imagePublicId = data.public_id; //Get public_id
-        console.log("Add project success:", data);
-      } catch (error) {
-        console.error("Image upload error:", error);
-        return;
+        imageUrl = data.secure_url;
+        imagePublicId = data.public_id;
       }
-    }
 
-    const now = Date.now();
-    const date = new Date(now);
-    const longDateFormat = date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+      // Get current date in long format
+      const now = new Date();
+      const longDateFormat = now.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
 
-    // Create new project data
-    const newProject = {
-      ...projectData,
-      userId: currentUser?.uid || "",
-      image: {
-        imageUrl,
-        imagePublicId,
-      },
-      createdAt: longDateFormat,
-      updatedAt: longDateFormat,
-    };
+      // Run the transaction
+      await runTransaction(db, async (transaction) => {
+        // Create a new project reference
+        const projectRef = doc(collection(db, "projects"));
+        
+        // Get all yarn references and their current data
+        const yarnRefs = projectData.yarnUsed.map(yarn => 
+          doc(db, "yarn", yarn.yarnId)
+        );
+        
+        // Fetch all yarn documents
+        const yarnDocs = await Promise.all(
+          yarnRefs.map(ref => transaction.get(ref))
+        );
 
-    // Add the new project to Firestore
-    const projectRef = await addDoc(projectsCollection, newProject);
-    const projectId = projectRef.id;
-
-    // Update each yarn's usedInProjects and remainingAmount
-    for (const yarnData of projectData.yarnUsed) {
-      const { yarnId, amount } = yarnData;
-      const yarnRef = doc(db, "yarn", yarnId);
-      const yarnSnap = await getDoc(yarnRef);
-
-      if (yarnSnap.exists()) {
-        const yarnInfo = yarnSnap.data();
-        const totalAvailable = yarnInfo.skeinAmount * yarnInfo.amountPerSkein;
-        const newRemainingAmount = totalAvailable - amount;
-
-        // Store projectId AND amount used in this yarn
-        const usedEntry = { projectId, amount: Number(amount) };
-
-        await updateDoc(yarnRef, {
-          remainingAmount: newRemainingAmount,
-          usedInProjects: arrayUnion(usedEntry),
+        // Verify all yarns exist
+        yarnDocs.forEach((doc, idx) => {
+          if (!doc.exists()) {
+            throw new Error(`Yarn with ID ${projectData.yarnUsed[idx].yarnId} not found`);
+          }
         });
-      }
+
+        // Update each yarn's data within the transaction
+        projectData.yarnUsed.forEach((yarnData, idx) => {
+          const yarnDoc = yarnDocs[idx];
+          const yarnInfo = yarnDoc.data();
+          
+          // Calculate the new remaining amount
+          const totalAvailable = yarnInfo.skeinAmount * yarnInfo.amountPerSkein;
+          const currentUsed = (yarnInfo.usedInProjects || [])
+            .reduce((sum, project) => sum + project.amount, 0);
+          const newUsed = currentUsed + Number(yarnData.amount);
+
+          // Check if the new used amount is greater than the total available
+          if (newUsed > totalAvailable) {
+            throw new Error(
+              `Not enough yarn available for ${yarnInfo.name}. Available: ${totalAvailable - currentUsed}oz, Attempted to use: ${yarnData.amount}oz`
+            );
+          }
+
+          // Update the yarn document
+          transaction.update(yarnRefs[idx], {
+            usedInProjects: [
+              ...(yarnInfo.usedInProjects || []),
+              { projectId: projectRef.id, amount: Number(yarnData.amount) }
+            ],
+            remainingAmount: totalAvailable - newUsed
+          });
+        });
+
+        // Create the new project document
+        transaction.set(projectRef, {
+          ...projectData,
+          userId: currentUser?.uid || "",
+          image: {
+            imageUrl,
+            imagePublicId,
+          },
+          createdAt: longDateFormat,
+          updatedAt: longDateFormat,
+        });
+      });
+
+    } catch (error) {
+      console.error("Failed to add project:", error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -101,6 +126,7 @@ export default function AddProject() {
       projectFormData={projectData}
       onSubmit={handleAddProject}
       isEditMode={false}
+      loading={loading}
     />
   );
 }

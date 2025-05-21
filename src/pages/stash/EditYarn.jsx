@@ -40,7 +40,7 @@ export default function EditYarn() {
       formData.append("file", selectedFile);
       formData.append(
         "upload_preset",
-        import.meta.env.VITE_CLOUDINARY_PRESET_NAME,
+        import.meta.env.VITE_CLOUDINARY_PRESET_NAME
       );
       formData.append("cloud_name", import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
 
@@ -50,7 +50,7 @@ export default function EditYarn() {
           {
             method: "POST",
             body: formData,
-          },
+          }
         );
         const data = await response.json();
         imageUrl = data.secure_url;

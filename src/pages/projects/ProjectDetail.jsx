@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { getProject, deleteItem, getYarn } from "../../api";
-import yarnpie from "../../assets/yarnpie.jpg"
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
+import yarnpie from "../../assets/yarnpie.jpg";
 
 export default function ProjectDetail() {
   const { projectId } = useParams();
@@ -52,8 +54,35 @@ export default function ProjectDetail() {
   }, [projectId]);
 
   const handleDeleteProject = async () => {
+    // Create warning message about yarn amounts being restored
+    const yarnWarning = yarnDetails.length > 0
+      ? `\n\nThis project uses the following yarns:\n${yarnDetails
+          .map(yarn => `- ${yarn.name} (${yarn.amountUsed} oz)`)
+          .join('\n')}\n\nDeleting this project will restore these amounts back to your yarn stash.`
+      : "";
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete this project? This action cannot be undone.${yarnWarning}`
+    );
+    if (!confirmDelete) return;
+
     setLoading(true);
+
     try {
+      // First update all affected yarns to remove this project and restore amounts
+      await Promise.all(yarnDetails.map(async (yarn) => {
+        // Remove this project from the yarn's usedInProjects array
+        const updatedUsedInProjects = yarn.usedInProjects.filter(
+          project => project.projectId !== projectId
+        );
+
+        // Update the yarn document - fixed collection name from "yarns" to "yarn"
+        await updateDoc(doc(db, "yarn", yarn.id), {
+          usedInProjects: updatedUsedInProjects
+        });
+      }));
+
+      // Then delete the project
       await deleteItem("project", project.id, project.image.imagePublicId);
       navigate("/projects", { replace: true });
     } catch (err) {
@@ -81,7 +110,9 @@ export default function ProjectDetail() {
 
       {project && (
         <div className="detail">
-          <img src={project.image.imageUrl ? project.image.imageUrl : yarnpie} />
+          <img
+            src={project.image.imageUrl ? project.image.imageUrl : yarnpie}
+          />
           <h2>{project.name}</h2>
           <p>Status: {project.status}</p>
           <p>Last updated: {project.updatedAt}</p>
@@ -91,7 +122,8 @@ export default function ProjectDetail() {
             {yarnDetails.length > 0 ? (
               yarnDetails.map((yarn) => (
                 <li key={yarn.id}>
-                  <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link> - {yarn.amountUsed} oz used
+                  <Link to={`/stash/${yarn.id}`}>{yarn.name}</Link> -{" "}
+                  {yarn.amountUsed} oz used
                 </li>
               ))
             ) : (

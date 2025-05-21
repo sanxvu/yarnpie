@@ -85,14 +85,28 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
   }));
 
   const handleYarnChange = (selectedOptions) => {
-    const updatedYarns = selectedOptions.map((option) => {
+    // Convert selectedOptions to array if null
+    const selected = selectedOptions || [];
+
+    // Keep existing amounts for yarns that are still selected
+    const updatedYarns = selected.map((option) => {
       const existing = projectData.yarnUsed.find(
         (y) => y.yarnId === option.value
       );
       return existing || { yarnId: option.value, amount: 0 };
     });
+
     setProjectData((prev) => ({ ...prev, yarnUsed: updatedYarns }));
   };
+
+  function updateYarnAmount(index, amount) {
+    setProjectData((prev) => ({
+      ...prev,
+      yarnUsed: prev.yarnUsed.map((yarn, i) =>
+        i === index ? { ...yarn, amount } : yarn
+      ),
+    }));
+  }
 
   return (
     <div className="form-container">
@@ -178,17 +192,9 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
                       min="0"
                       step="0.1"
                       value={yarn.amount}
-                      onChange={(e) => {
-                        const newAmount = parseFloat(e.target.value);
-                        setProjectData((prev) => {
-                          const updated = [...prev.yarnUsed];
-                          updated[index] = {
-                            ...updated[index],
-                            amount: newAmount,
-                          };
-                          return { ...prev, yarnUsed: updated };
-                        });
-                      }}
+                      onChange={(e) =>
+                        updateYarnAmount(index, parseFloat(e.target.value))
+                      }
                     />
                   </label>
                 </div>

@@ -4,12 +4,7 @@ import { deleteImage } from "../../api";
 import FileInput from "../../components/FileInput";
 import "../../components/Form.css";
 
-export default function YarnForm({
-  yarnFormData,
-  projectFormData,
-  onSubmit,
-  isEditMode,
-}) {
+export default function YarnForm({ yarnFormData, onSubmit, isEditMode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const returnPath = location.state?.from || "/stash";
@@ -30,7 +25,7 @@ export default function YarnForm({
         setPreview(formData.image.imageUrl);
       }
     }
-  }, [location.state, yarnData]);
+  }, [location.state]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -51,7 +46,7 @@ export default function YarnForm({
       if (isEditMode && imageRemoved && yarnData.image?.imagePublicId) {
         console.log(
           "Removing image with public ID:",
-          yarnData.image.imagePublicId,
+          yarnData.image.imagePublicId
         ); // Debug log
         await deleteImage(yarnData.image.imagePublicId);
       }

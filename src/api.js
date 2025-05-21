@@ -46,6 +46,7 @@ export async function getProjects(user, callback) {
   return unsubscribe;
 }
 
+// Real-time yarn stash update
 export function getYarnStash(user, callback) {
   if (!user) {
     console.error("No user is logged in.");
@@ -107,6 +108,7 @@ export const deleteItem = async (itemType, itemId, imagePublicId) => {
   }
 };
 
+// Delete image 
 export async function deleteImage(imagePublicId) {
   try {
     const response = await axios.delete("http://localhost:8080/delete-image/", {
