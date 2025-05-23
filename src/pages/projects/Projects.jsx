@@ -58,7 +58,7 @@ export default function Projects() {
 
       <section className="projects-grid">
         {sortedProjects.length === 0 ? (
-          <p>No projects found. Start by adding a new one!</p>
+          <p className="no-projects-text">No projects found. Start by adding a new one!</p>
         ) : (
           sortedProjects.map((project) => (
             <ProjectCard key={project.id} project={project} />

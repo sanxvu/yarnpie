@@ -19,7 +19,8 @@
   font-style: normal;
 }
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
 }
@@ -70,34 +71,6 @@ header a:hover {
 nav {
   display: flex;
   padding: 1rem;
-}
-
-/*** HOME PAGE ***/
-.home-container {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  justify-items: center;
-  padding: 2rem;
-  background: linear-gradient(to bottom right, #fdf2f8, #f5f3ff, #eef2ff);
-}
-
-.home-header {
-  font-size: 1.2rem;
-  text-align: left;
-  margin-bottom: 3rem;
-}
-
-.home-container > img {
-  border: 0.5px solid;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 5rem;
-}
-
-.home-logo {
-  font-family: "Aztech Forest";
-  font-size: 5rem;
 }
 
 /*** DETAIL PAGE ***/

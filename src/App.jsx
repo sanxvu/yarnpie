@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
@@ -20,6 +20,17 @@ const EditYarn = lazy(() => import("./pages/stash/EditYarn"));
 import { ProjectsProvider } from "./contexts/ProjectsContext";
 import { StashProvider } from "./contexts/StashContext";
 
+// Protected Route component
+function ProtectedRoute({ children }) {
+  const { userLoggedIn } = useAuth();
+  
+  if (!userLoggedIn) {
+    return <Navigate to="/login" />;
+  }
+  
+  return children;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -30,61 +41,71 @@ export default function App() {
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
 
-            {/* Projects routes with Suspense and context */}
+            {/* Protected Projects routes */}
             <Route
               path="projects"
               element={
-                <Suspense fallback={<></>}>
-                  <ProjectsProvider>
-                    <Projects />
-                  </ProjectsProvider>
-                </Suspense>
+                <ProtectedRoute>
+                  <Suspense fallback={<></>}>
+                    <ProjectsProvider>
+                      <Projects />
+                    </ProjectsProvider>
+                  </Suspense>
+                </ProtectedRoute>
               }
             />
             <Route
               path="projects/:projectId"
               element={
-                <Suspense fallback={<></>}>
-                  <ProjectsProvider>
-                    <ProjectDetail />
-                  </ProjectsProvider>
-                </Suspense>
+                <ProtectedRoute>
+                  <Suspense fallback={<></>}>
+                    <ProjectsProvider>
+                      <ProjectDetail />
+                    </ProjectsProvider>
+                  </Suspense>
+                </ProtectedRoute>
               }
             />
             <Route
               path="addProject"
               element={
-                <Suspense fallback={<></>}>
-                  <StashProvider>
-                    <ProjectsProvider>
-                      <AddProject />
-                    </ProjectsProvider>
-                  </StashProvider>
-                </Suspense>
+                <ProtectedRoute>
+                  <Suspense fallback={<></>}>
+                    <StashProvider>
+                      <ProjectsProvider>
+                        <AddProject />
+                      </ProjectsProvider>
+                    </StashProvider>
+                  </Suspense>
+                </ProtectedRoute>
               }
             />
             <Route
               path="editProject/:projectId"
               element={
-                <Suspense fallback={<></>}>
-                  <StashProvider>
-                    <ProjectsProvider>
-                      <EditProject />
-                    </ProjectsProvider>
-                  </StashProvider>
-                </Suspense>
+                <ProtectedRoute>
+                  <Suspense fallback={<></>}>
+                    <StashProvider>
+                      <ProjectsProvider>
+                        <EditProject />
+                      </ProjectsProvider>
+                    </StashProvider>
+                  </Suspense>
+                </ProtectedRoute>
               }
             />
 
-            {/* Stash routes with Suspense and context */}
+            {/* Protected Stash routes */}
             <Route
               path="stash"
               element={
-                <Suspense fallback={<></>}>
-                  <StashProvider>
-                    <Stash />
-                  </StashProvider>
-                </Suspense>
+                <ProtectedRoute>
+                  <Suspense fallback={<></>}>
+                    <StashProvider>
+                      <Stash />
+                    </StashProvider>
+                  </Suspense>
+                </ProtectedRoute>
               }
             />
             <Route
