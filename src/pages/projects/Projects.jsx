@@ -1,63 +1,70 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { ProjectsContext } from "../../contexts/ProjectsContext";
 import { Link } from "react-router-dom";
-import yarnpie from "../../assets/yarnpie.jpg"
+import ProjectCard from "./ProjectCard"; // import the new card component
+import "./Projects.css";
 
 export default function Projects() {
   const { projects, error } = useContext(ProjectsContext);
-  const [sortOption, setSortOption] = useState("lastUpdated");
+  const [sortBy, setSortBy] = useState("lastUpdated");
 
-  const sortedProjects = [...projects].sort((a, b) => {
-    switch (sortOption) {
-      case "name":
-        return a.name.localeCompare(b.name);
-      case "lastUpdated":
-        return b.updatedAt - a.updatedAt;
-      case "startDate":
-        return b.createdAt - a.createdAt;
-      default:
-        return 0;
-    }
-  });
-
-  const projectElements = sortedProjects.map((project) => (
-    <Link to={project.id} key={project.id}>
-      <div className="yarn-tile">
-        <div className="yarn-info">
-          <img src={project.image.imageUrl ? project.image.imageUrl : yarnpie} />
-          <h2>{project.name}</h2>
-          <p>{project.updatedAt}</p>
-        </div>
-      </div>
-    </Link>
-  ));
+  const sortedProjects = useMemo(() => {
+    return [...projects].sort((a, b) => {
+      switch (sortBy) {
+        case "name":
+          return a.name.localeCompare(b.name);
+        case "lastUpdated":
+          return b.updatedAt - a.updatedAt;
+        case "startDate":
+          return b.createdAt - a.createdAt;
+        default:
+          return 0;
+      }
+    });
+  }, [projects, sortBy]);
 
   if (error) {
-    return <h1>There was an error: {error.message}</h1>;
+    return <h1>Oops! Something went wrong: {error.message}</h1>;
   }
 
   return (
-    <div className="stash-container">
-      <div className="header-container">
-        <h1>Projects</h1>
-        <h4>({projectElements.length} projects total)</h4>
-        <div className="filter-container">
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-          >
-            <option value="name">Name</option>
-            <option value="lastUpdated">Last Updated</option>
-            <option value="startDate">Start Date</option>
-          </select>
+    <div className="projects-page">
+      <header className="projects-header">
+        <div className="header-text">
+          <h1 className="page-title">Your Projects</h1>
+          <p className="page-subtitle">
+            Keep track of all your crochet projects in one place.
+          </p>
         </div>
-      </div>
 
-      <Link to="../addProject">
-        <button className="header-add-button">+ Add project</button>
-      </Link>
+        <div className="header-actions">
+          <div className="sort-dropdown">
+            <select
+              id="sortBy"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="lastUpdated">Last Updated</option>
+              <option value="name">Name</option>
+              <option value="startDate">Start Date</option>
+            </select>
+          </div>
 
-      <div className="stash-list">{projectElements}</div>
+          <Link to="/addProject">
+            <button className="new-project-button">+ New Project</button>
+          </Link>
+        </div>
+      </header>
+
+      <section className="projects-grid">
+        {sortedProjects.length === 0 ? (
+          <p>No projects found. Start by adding a new one!</p>
+        ) : (
+          sortedProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))
+        )}
+      </section>
     </div>
   );
 }

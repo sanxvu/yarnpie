@@ -4,8 +4,6 @@ import { getProject, deleteItem, getYarn } from "../../api";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import yarnpie from "../../assets/yarnpie.jpg";
-import Spinner from "../../components/Spinner";
-import "../../components/Spinner.css";
 
 export default function ProjectDetail() {
   const { projectId } = useParams();

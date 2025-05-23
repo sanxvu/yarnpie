@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { StashContext } from "../../contexts/StashContext";
 import { Link } from "react-router-dom";
 import yarnpie from "../../assets/yarnpie.jpg";
+import "../projects/Projects.css";
 
 export default function Stash() {
   const { yarnStash, error } = useContext(StashContext);
@@ -35,27 +36,34 @@ export default function Stash() {
   }
 
   return (
-    <div className="stash-container">
-      <div className="header-container">
-        <h1>Stash</h1>
-        <h4>({yarnElements.length} yarn total)</h4>
-        <div className="filter-container">
-          <select
-            className="projects-filter"
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-          >
-            <option value="name">Name</option>
-            <option value="lastUpdated">Last Updated</option>
-          </select>
+    <div className="projects-page">
+      <header className="projects-header">
+        <div className="header-text">
+          <h1 className="page-title">Your Yarn Stash</h1>
+          <p className="page-subtitle">
+            Keep track of all your yarn in one place.
+          </p>
         </div>
-      </div>
+        {/* <span>({yarnElements.length} yarn total)</span> */}
 
-      <Link to="../addYarn">
-        <button className="header-add-button">+ Add yarn</button>
-      </Link>
+        <div className="header-actions">
+          <div className="sort-dropdown">
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+            >
+              <option value="name">Name</option>
+              <option value="lastUpdated">Last Updated</option>
+            </select>
+          </div>
 
-      <div className="stash-list">{yarnElements}</div>
+          <Link to="../addYarn">
+            <button className="new-project-button">+ New Yarn</button>
+          </Link>
+        </div>
+      </header>
+
+      <section className="projects-grid">{yarnElements}</section>
     </div>
   );
 }

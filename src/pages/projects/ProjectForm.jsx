@@ -131,7 +131,7 @@ export default function ProjectForm({ projectFormData, onSubmit, isEditMode }) {
           <div className="form-fieldset-group">
             <label htmlFor="status-fieldset">Status</label>
             <fieldset id="status-fieldset">
-              {["Work In Progress", "Completed", "Abandoned", "Frogged"].map(
+              {["Planned", "In Progress", "Completed", "Abandoned", "Frogged"].map(
                 (status) => {
                   const id = status.toLowerCase().replace(/\s+/g, "");
                   return (
