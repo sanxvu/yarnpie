@@ -9,4 +9,5 @@ Whether you're the type to hoard the softest skeins, start ten projects at once,
 Inspired by the magpie's instinct to gather beautiful things, Yarnpie brings a touch of charm to staying organized. No spreadsheets, no stress — just a more delightful way to manage your making.
 
 Yarnpie: https://yarnpie.com/
-Project Management: https://www.notion.so/snippets-of-san/Project-Manager-1de7aa1eb2af807bb419fa2ad1cd12d6?source=copy_link
+
+View my [project management tracker]([url](https://www.notion.so/snippets-of-san/Project-Manager-1de7aa1eb2af807bb419fa2ad1cd12d6?source=copy_link)).
