@@ -10,4 +10,4 @@ Inspired by the magpie's instinct to gather beautiful things, Yarnpie brings a t
 
 Yarnpie: https://yarnpie.com/
 
-View my [project management tracker]([url](https://www.notion.so/snippets-of-san/Project-Manager-1de7aa1eb2af807bb419fa2ad1cd12d6?source=copy_link)).
+View my [project management tracker](https://www.notion.so/snippets-of-san/Project-Manager-1de7aa1eb2af807bb419fa2ad1cd12d6?source=copy_link).
