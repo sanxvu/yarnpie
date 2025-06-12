@@ -64,12 +64,6 @@ export default function Home() {
           stress — just a more delightful way to manage your making.
         </p>
       </div>
-      <footer className="footer">
-        <p>
-          &copy; {new Date().getFullYear()} Yarnpie. Made with ❤️ for yarn
-          lovers everywhere.
-        </p>
-      </footer>
     </div>
   );
 }

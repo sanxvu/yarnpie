@@ -41,7 +41,7 @@ export default function App() {
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
 
-            {/* Protected Projects routes */}
+            {/* Projects routes with Suspense and context */}
             <Route
               path="projects"
               element={
@@ -95,7 +95,7 @@ export default function App() {
               }
             />
 
-            {/* Protected Stash routes */}
+            {/* Stash routes with Suspense and context */}
             <Route
               path="stash"
               element={

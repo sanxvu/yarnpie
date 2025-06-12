@@ -37,7 +37,7 @@ export default function Stash() {
 
   return (
     <div className="projects-page">
-      <header className="projects-header">
+      <div className="projects-header">
         <div className="header-text">
           <h1 className="page-title">Your Yarn Stash</h1>
           <p className="page-subtitle">
@@ -61,7 +61,7 @@ export default function Stash() {
             <button className="new-project-button">+ New Yarn</button>
           </Link>
         </div>
-      </header>
+      </div>
 
       <section className="projects-grid">{yarnElements}</section>
     </div>

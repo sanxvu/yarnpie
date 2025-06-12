@@ -41,38 +41,6 @@ a {
   flex-direction: column;
 }
 
-header {
-  height: 6rem;
-  display: flex;
-  align-items: center;
-}
-
-header .site-logo {
-  margin-right: auto;
-  color: black;
-  font-family: "Aztech Forest";
-  font-size: 2rem;
-  margin-top: 0.75rem;
-  margin-left: 1rem;
-}
-
-header a {
-  text-decoration: none;
-  color: #4d4d4d;
-  font-weight: 600;
-  padding: 5px 20px;
-}
-
-header a:hover {
-  color: #161616;
-  text-decoration: underline;
-}
-
-nav {
-  display: flex;
-  padding: 1rem;
-}
-
 /*** DETAIL PAGE ***/
 .detail-container {
   padding: 2rem;

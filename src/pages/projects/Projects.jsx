@@ -29,7 +29,7 @@ export default function Projects() {
 
   return (
     <div className="projects-page">
-      <header className="projects-header">
+      <div className="projects-header">
         <div className="header-text">
           <h1 className="page-title">Your Projects</h1>
           <p className="page-subtitle">
@@ -54,7 +54,7 @@ export default function Projects() {
             <button className="new-project-button">+ New Project</button>
           </Link>
         </div>
-      </header>
+      </div>
 
       <section className="projects-grid">
         {sortedProjects.length === 0 ? (
