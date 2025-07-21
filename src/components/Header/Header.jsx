@@ -24,7 +24,7 @@ export default function Header() {
         )}
 
         {userLoggedIn ? (
-          <button
+          <button className="logout-button"
             onClick={() => {
               doSignOut().then(() => {
                 navigate("/login");

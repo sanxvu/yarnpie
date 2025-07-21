@@ -64,6 +64,7 @@
   gap: 8px;
   cursor: pointer;
   transition: background 0.3s ease;
+  white-space: nowrap;
 }
 
 .new-project-button:hover {
@@ -76,16 +77,13 @@
   align-items: center;
   gap: 0.5rem;
   color: #374151;
-  font-size: 0.9rem;
 }
 
 .sort-dropdown select {
   padding: 0.3rem 0.6rem;
   border: 1px solid #d1d5db;
   background-color: white;
-  font-size: 1.125rem;
-  line-height: 1.5;
-  height: 2.5rem;
+  font-size: 1rem;
 }
 
 /* Grid Layout */
